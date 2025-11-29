@@ -728,7 +728,7 @@ export const ProductSuggestions = () => {
                   <div className="flex gap-3 flex-1 min-w-0">
                     <div className="flex-1 min-w-0 flex flex-col justify-center">
                       <div className="flex items-center gap-2">
-                        <CardTitle className="text-base">{product.name}</CardTitle>
+                        <CardTitle className="text-base leading-none">{product.name}</CardTitle>
                         {product.validatedByManufacturer && (
                           <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
                         )}
