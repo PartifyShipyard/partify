@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { MessageSquare, Send, Loader2, X } from "lucide-react";
+import { MessageSquare, Send, Loader2, X, Hash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
+import { Toggle } from "@/components/ui/toggle";
 
 interface Message {
   id: string;
@@ -29,6 +30,7 @@ export const ChatInterface = ({ isOpen, onToggle }: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [searchByPartNumber, setSearchByPartNumber] = useState(false);
 
   const handleSend = () => {
     if (!input.trim()) return;
@@ -46,10 +48,14 @@ export const ChatInterface = ({ isOpen, onToggle }: ChatInterfaceProps) => {
 
     // Simulate AI response
     setTimeout(() => {
+      const responseContent = searchByPartNumber
+        ? `Searching for part number: ${input}. I'll look for exact matches in our catalog.`
+        : "I found several parts matching your search. Check the suggestions panel for details and pricing.";
+      
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: "I found several parts matching your search. Check the suggestions panel on the right for details and pricing.",
+        content: responseContent,
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, aiMessage]);
@@ -118,12 +124,27 @@ export const ChatInterface = ({ isOpen, onToggle }: ChatInterfaceProps) => {
 
       {/* Input Area */}
       <div className="border-t border-border p-4 flex-shrink-0">
+        <div className="flex items-center gap-2 mb-2">
+          <Toggle
+            pressed={searchByPartNumber}
+            onPressedChange={setSearchByPartNumber}
+            size="sm"
+            aria-label="Search by part number"
+          >
+            <Hash className="h-4 w-4 mr-1" />
+            <span className="text-xs">Part Number</span>
+          </Toggle>
+        </div>
         <div className="flex gap-2">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === "Enter" && handleSend()}
-            placeholder="Describe the part you're looking for..."
+            placeholder={
+              searchByPartNumber
+                ? "Enter part number (e.g., LCD-IP14P-OL)..."
+                : "Describe the part you're looking for..."
+            }
             className="flex-1"
           />
           <Button onClick={handleSend} disabled={!input.trim() || isLoading}>
