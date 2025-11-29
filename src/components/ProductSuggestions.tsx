@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronDown, ChevronUp, ExternalLink, ShoppingCart, Grid3x3, List, X, Filter, CheckCircle, ArrowUpDown } from "lucide-react";
+import { ChevronDown, ChevronUp, ExternalLink, ShoppingCart, Grid3x3, List, X, Filter, CheckCircle, ArrowUpDown, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +7,16 @@ import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useToast } from "@/hooks/use-toast";
 
 interface Product {
   id: string;
@@ -22,6 +32,22 @@ interface Product {
   description: string;
   compatibleModels: string[];
 }
+
+const productFormSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
+  partNumber: z.string().trim().min(1, "Part number is required").max(50, "Part number must be less than 50 characters"),
+  brand: z.string().trim().min(1, "Brand is required").max(50, "Brand must be less than 50 characters"),
+  price: z.coerce.number().positive("Price must be positive").max(999999, "Price is too high"),
+  shippingCost: z.coerce.number().positive("Shipping cost must be positive").max(9999, "Shipping cost is too high"),
+  estimatedShipping: z.string().trim().min(1, "Estimated shipping is required").max(50, "Estimated shipping must be less than 50 characters"),
+  validatedByManufacturer: z.boolean(),
+  availability: z.enum(["in-stock", "limited", "out-of-stock"]),
+  image: z.string().trim().url("Must be a valid URL"),
+  description: z.string().trim().min(1, "Description is required").max(500, "Description must be less than 500 characters"),
+  compatibleModels: z.string().trim().min(1, "Compatible models are required").max(500, "Compatible models must be less than 500 characters"),
+});
+
+type ProductFormValues = z.infer<typeof productFormSchema>;
 
 const mockProducts: Product[] = [
   {
@@ -167,19 +193,39 @@ const mockProducts: Product[] = [
 ];
 
 export const ProductSuggestions = () => {
+  const { toast } = useToast();
+  const [products, setProducts] = useState<Product[]>(mockProducts);
   const [expandedId, setExpandedId] = useState<string | null>("1");
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
   const [selectedModels, setSelectedModels] = useState<string[]>([]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [sortBy, setSortBy] = useState<string>("default");
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const form = useForm<ProductFormValues>({
+    resolver: zodResolver(productFormSchema),
+    defaultValues: {
+      name: "",
+      partNumber: "",
+      brand: "",
+      price: 0,
+      shippingCost: 0,
+      estimatedShipping: "",
+      validatedByManufacturer: false,
+      availability: "in-stock",
+      image: "",
+      description: "",
+      compatibleModels: "",
+    },
+  });
 
   // Extract unique models and brands
-  const allModels = Array.from(new Set(mockProducts.flatMap((p) => p.compatibleModels)));
-  const allBrands = Array.from(new Set(mockProducts.map((p) => p.brand)));
+  const allModels = Array.from(new Set(products.flatMap((p) => p.compatibleModels)));
+  const allBrands = Array.from(new Set(products.map((p) => p.brand)));
 
   // Filter products
-  const filteredProducts = mockProducts.filter((product) => {
+  const filteredProducts = products.filter((product) => {
     const modelMatch = selectedModels.length === 0 || 
       product.compatibleModels.some((model) => selectedModels.includes(model));
     const brandMatch = selectedBrands.length === 0 || 
@@ -218,6 +264,31 @@ export const ProductSuggestions = () => {
     setSelectedBrands([]);
   };
 
+  const onSubmit = (data: ProductFormValues) => {
+    const newProduct: Product = {
+      id: Date.now().toString(),
+      name: data.name,
+      partNumber: data.partNumber,
+      brand: data.brand,
+      price: data.price,
+      shippingCost: data.shippingCost,
+      estimatedShipping: data.estimatedShipping,
+      validatedByManufacturer: data.validatedByManufacturer,
+      availability: data.availability,
+      image: data.image,
+      description: data.description,
+      compatibleModels: data.compatibleModels.split(',').map(m => m.trim()),
+    };
+    
+    setProducts([newProduct, ...products]);
+    setDialogOpen(false);
+    form.reset();
+    toast({
+      title: "Product added",
+      description: "The new product has been added successfully.",
+    });
+  };
+
   const getAvailabilityColor = (availability: Product["availability"]) => {
     switch (availability) {
       case "in-stock":
@@ -242,7 +313,206 @@ export const ProductSuggestions = () => {
       {/* Controls: Filtering and Sorting */}
       <div className="sticky top-0 z-10 bg-card border-b border-border h-[64px] flex items-center px-4">
         <div className="flex items-center justify-between w-full">
-          <Select value={sortBy} onValueChange={setSortBy}>
+          <div className="flex items-center gap-2">
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Product
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Add New Product</DialogTitle>
+                  <DialogDescription>
+                    Fill in the product details below to add a new part to the catalog.
+                  </DialogDescription>
+                </DialogHeader>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Product Name</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Premium Brake Pad Set" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="partNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Part Number</FormLabel>
+                            <FormControl>
+                              <Input placeholder="BP-2024-FR" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="brand"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Brand</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Brembo" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="availability"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Availability</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select availability" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="in-stock">In Stock</SelectItem>
+                                <SelectItem value="limited">Limited</SelectItem>
+                                <SelectItem value="out-of-stock">Out of Stock</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-3 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="price"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Price (€)</FormLabel>
+                            <FormControl>
+                              <Input type="number" step="0.01" placeholder="84.99" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="shippingCost"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Shipping Cost (€)</FormLabel>
+                            <FormControl>
+                              <Input type="number" step="0.01" placeholder="5.99" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="estimatedShipping"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Est. Shipping</FormLabel>
+                            <FormControl>
+                              <Input placeholder="2-3 business days" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    
+                    <FormField
+                      control={form.control}
+                      name="image"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Image URL</FormLabel>
+                          <FormControl>
+                            <Input placeholder="https://images.unsplash.com/..." {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Description</FormLabel>
+                          <FormControl>
+                            <Textarea placeholder="High-performance ceramic brake pads..." {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="compatibleModels"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Compatible Models (comma-separated)</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Honda Civic 2020-2024, Honda Accord 2019-2024" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="validatedByManufacturer"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                          <div className="space-y-1 leading-none">
+                            <FormLabel>
+                              Validated by Manufacturer
+                            </FormLabel>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <DialogFooter>
+                      <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
+                        Cancel
+                      </Button>
+                      <Button type="submit">Add Product</Button>
+                    </DialogFooter>
+                  </form>
+                </Form>
+              </DialogContent>
+            </Dialog>
+            
+            <Select value={sortBy} onValueChange={setSortBy}>
             <SelectTrigger className="w-[180px] h-9">
               <ArrowUpDown className="h-4 w-4 mr-2" />
               <SelectValue placeholder="Sort by" />
@@ -253,7 +523,8 @@ export const ProductSuggestions = () => {
               <SelectItem value="price-high">Price: High to Low</SelectItem>
               <SelectItem value="validated">Validated First</SelectItem>
             </SelectContent>
-          </Select>
+            </Select>
+          </div>
           <div className="flex gap-1">
             <Popover open={filtersOpen} onOpenChange={setFiltersOpen}>
               <PopoverTrigger asChild>
