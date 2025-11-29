@@ -53,7 +53,7 @@ export const ChatInterface = () => {
   };
 
   return (
-    <div className="flex h-screen flex-col bg-background">
+    <div className="flex h-screen w-96 flex-col bg-background">
       {/* Chat Header */}
       <div className="border-b border-border px-6 py-4">
         <h1 className="text-xl font-semibold text-foreground">Search Spare Parts</h1>
