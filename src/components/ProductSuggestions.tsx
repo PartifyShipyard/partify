@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronDown, ChevronUp, ExternalLink, ShoppingCart, Grid3x3, List, X, Filter, CheckCircle, ArrowUpDown, Plus } from "lucide-react";
+import { ChevronDown, ChevronUp, ExternalLink, ShoppingCart, X, Filter, CheckCircle, ArrowUpDown, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -196,7 +196,6 @@ export const ProductSuggestions = () => {
   const { toast } = useToast();
   const [products, setProducts] = useState<Product[]>(mockProducts);
   const [expandedId, setExpandedId] = useState<string | null>("1");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("list");
   const [selectedModels, setSelectedModels] = useState<string[]>([]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -613,27 +612,13 @@ export const ProductSuggestions = () => {
                 </ScrollArea>
               </PopoverContent>
             </Popover>
-            <Button
-              variant={viewMode === "list" ? "secondary" : "ghost"}
-              size="icon"
-              onClick={() => setViewMode("list")}
-            >
-              <List className="h-4 w-4" />
-            </Button>
-            <Button
-              variant={viewMode === "grid" ? "secondary" : "ghost"}
-              size="icon"
-              onClick={() => setViewMode("grid")}
-            >
-              <Grid3x3 className="h-4 w-4" />
-            </Button>
           </div>
         </div>
       </div>
 
       {/* Products List */}
       <ScrollArea className="flex-1">
-        <div className={viewMode === "grid" ? "grid grid-cols-2 gap-3 p-4" : "space-y-3 p-4"}>
+        <div className="space-y-3 p-4">
           {sortedProducts.map((product) => (
             <Card key={product.id} className="overflow-hidden">
               <CardHeader className="p-4">
