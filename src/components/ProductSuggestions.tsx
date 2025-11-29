@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronDown, ChevronUp, ExternalLink, ShoppingCart, Grid3x3, List, X, Filter } from "lucide-react";
+import { ChevronDown, ChevronUp, ExternalLink, ShoppingCart, Grid3x3, List, X, Filter, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +14,8 @@ interface Product {
   brand: string;
   price: number;
   shippingCost: number;
+  estimatedShipping: string;
+  validatedByManufacturer: boolean;
   availability: "in-stock" | "limited" | "out-of-stock";
   image: string;
   description: string;
@@ -28,6 +30,8 @@ const mockProducts: Product[] = [
     brand: "Brembo",
     price: 84.99,
     shippingCost: 5.99,
+    estimatedShipping: "2-3 business days",
+    validatedByManufacturer: true,
     availability: "in-stock",
     image: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400",
     description: "High-performance ceramic brake pads for front axle",
@@ -40,6 +44,8 @@ const mockProducts: Product[] = [
     brand: "AutoParts Pro",
     price: 47.99,
     shippingCost: 4.99,
+    estimatedShipping: "3-5 business days",
+    validatedByManufacturer: false,
     availability: "in-stock",
     image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=400",
     description: "Reliable brake pads for everyday use",
@@ -52,6 +58,8 @@ const mockProducts: Product[] = [
     brand: "StopTech",
     price: 284.99,
     shippingCost: 9.99,
+    estimatedShipping: "1-2 business days",
+    validatedByManufacturer: true,
     availability: "limited",
     image: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=400",
     description: "Complete brake upgrade kit with rotors and pads",
@@ -231,7 +239,12 @@ export const ProductSuggestions = () => {
                       />
                     )}
                     <div className="flex-1 min-w-0">
-                      <CardTitle className="text-base">{product.name}</CardTitle>
+                      <div className="flex items-center gap-2">
+                        <CardTitle className="text-base">{product.name}</CardTitle>
+                        {product.validatedByManufacturer && (
+                          <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
+                        )}
+                      </div>
                       <p className="text-sm text-muted-foreground">{product.brand}</p>
                       <p className="mt-1 text-xs text-muted-foreground">#{product.partNumber}</p>
                       {expandedId !== product.id && (
@@ -287,6 +300,9 @@ export const ProductSuggestions = () => {
                         </div>
                         <div className="text-xs text-muted-foreground">
                           + €{product.shippingCost.toFixed(2)} shipping
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          Est. delivery: {product.estimatedShipping}
                         </div>
                       </div>
                     </div>
