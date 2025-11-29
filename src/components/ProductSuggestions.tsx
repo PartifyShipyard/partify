@@ -263,7 +263,7 @@ const mockProducts: Product[] = [
 export const ProductSuggestions = () => {
   const { toast } = useToast();
   const [products, setProducts] = useState<Product[]>(mockProducts);
-  const [expandedId, setExpandedId] = useState<string | null>("1");
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [selectedModels, setSelectedModels] = useState<string[]>([]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -669,18 +669,18 @@ export const ProductSuggestions = () => {
                         </Button>
                       </CollapsibleTrigger>
                       <CollapsibleContent className="mt-2 animate-accordion-down data-[state=closed]:animate-accordion-up">
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex flex-wrap gap-1">
                           {allModels.map((model) => (
                             <Button
                               key={model}
                               variant={selectedModels.includes(model) ? "default" : "outline"}
                               size="sm"
-                              className="h-auto py-1 px-3"
+                              className={`h-auto py-1 px-3 ${selectedModels.includes(model) ? 'bg-primary text-accent hover:bg-primary/90' : ''}`}
                               onClick={() => toggleModel(model)}
                             >
                               {model}
                               {selectedModels.includes(model) && (
-                                <X className="ml-1.5 h-3 w-3" />
+                                <X className="ml-0.5 h-3 w-3" />
                               )}
                             </Button>
                           ))}
@@ -696,18 +696,18 @@ export const ProductSuggestions = () => {
                         </Button>
                       </CollapsibleTrigger>
                       <CollapsibleContent className="mt-2 animate-accordion-down data-[state=closed]:animate-accordion-up">
-                        <div className="flex flex-wrap gap-2">
+                        <div className="flex flex-wrap gap-1">
                           {allBrands.map((brand) => (
                             <Button
                               key={brand}
                               variant={selectedBrands.includes(brand) ? "default" : "outline"}
                               size="sm"
-                              className="h-auto py-1 px-3"
+                              className={`h-auto py-1 px-3 ${selectedBrands.includes(brand) ? 'bg-primary text-accent hover:bg-primary/90' : ''}`}
                               onClick={() => toggleBrand(brand)}
                             >
                               {brand}
                               {selectedBrands.includes(brand) && (
-                                <X className="ml-1.5 h-3 w-3" />
+                                <X className="ml-0.5 h-3 w-3" />
                               )}
                             </Button>
                           ))}
@@ -841,10 +841,13 @@ export const ProductSuggestions = () => {
                           key={model}
                           variant="secondary"
                           size="sm"
-                          className="h-auto py-0.5 px-2 text-xs"
-                          disabled
+                          className={`h-auto py-0.5 px-2 text-xs ${selectedModels.includes(model) ? 'bg-primary text-accent' : 'bg-primary text-accent hover:bg-primary/90'}`}
+                          onClick={() => toggleModel(model)}
                         >
                           {model}
+                          {selectedModels.includes(model) && (
+                            <X className="ml-0.5 h-2.5 w-2.5" />
+                          )}
                         </Button>
                       ))}
                     </div>

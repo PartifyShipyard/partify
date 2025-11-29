@@ -136,7 +136,9 @@ const Auth = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md">
+      <div className="flex flex-col items-center gap-8">
+        <h1 className="text-5xl font-bold text-primary">partify</h1>
+        <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Welcome</CardTitle>
           <CardDescription>Sign in to your account or create a new one</CardDescription>
@@ -224,6 +226,7 @@ const Auth = () => {
           </Tabs>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 };

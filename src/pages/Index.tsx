@@ -5,11 +5,20 @@ import { Session } from "@supabase/supabase-js";
 import { ChatSidebar } from "@/components/ChatSidebar";
 import { ChatInterface } from "@/components/ChatInterface";
 import { ProductSuggestions } from "@/components/ProductSuggestions";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Index = () => {
   const navigate = useNavigate();
   const [session, setSession] = useState<Session | null>(null);
-  const [isChatOpen, setIsChatOpen] = useState(true);
+  const isMobile = useIsMobile();
+  const [isChatOpen, setIsChatOpen] = useState(() => {
+    // Start closed if viewport is too small for chat to fit inline
+    const chatWidth = 384;
+    const minContentWidth = 400;
+    const sidebarWidth = 256;
+    const totalNeeded = sidebarWidth + minContentWidth + chatWidth;
+    return window.innerWidth >= totalNeeded;
+  });
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   useEffect(() => {
@@ -28,6 +37,7 @@ const Index = () => {
     return () => subscription.unsubscribe();
   }, []);
 
+
   useEffect(() => {
     if (session === null) {
       // Wait a moment to see if we're loading the session
@@ -45,12 +55,12 @@ const Index = () => {
   }
 
   return (
-    <div className="flex h-full min-h-0 w-full overflow-hidden relative">
-      <ChatSidebar 
-        isCollapsed={isSidebarCollapsed} 
-        onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)} 
+    <div className={`flex h-full min-h-0 w-full overflow-hidden relative ${isMobile ? 'flex-col' : ''}`}>
+      <ChatSidebar
+        isCollapsed={isSidebarCollapsed}
+        onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
       />
-      <div className="flex flex-1 min-h-0">
+      <div className={`flex flex-1 min-h-0 ${isMobile ? 'flex-col' : ''}`}>
         <ProductSuggestions />
         <ChatInterface isOpen={isChatOpen} onToggle={() => setIsChatOpen(!isChatOpen)} />
       </div>

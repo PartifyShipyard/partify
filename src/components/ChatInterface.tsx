@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MessageSquare, Send, Loader2, X, Hash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -31,6 +31,22 @@ export const ChatInterface = ({ isOpen, onToggle }: ChatInterfaceProps) => {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [searchByPartNumber, setSearchByPartNumber] = useState(false);
+  const [useFloatingMode, setUseFloatingMode] = useState(false);
+
+  useEffect(() => {
+    const checkOverflow = () => {
+      const chatWidth = 384; // w-96 = 384px
+      const minContentWidth = 400; // Minimum space needed for content
+      const sidebarWidth = 256; // Approximate sidebar width when open
+      const totalNeeded = sidebarWidth + minContentWidth + chatWidth;
+
+      setUseFloatingMode(window.innerWidth < totalNeeded);
+    };
+
+    checkOverflow();
+    window.addEventListener('resize', checkOverflow);
+    return () => window.removeEventListener('resize', checkOverflow);
+  }, []);
 
   const handleSend = () => {
     if (!input.trim()) return;
@@ -63,22 +79,33 @@ export const ChatInterface = ({ isOpen, onToggle }: ChatInterfaceProps) => {
     }, 1000);
   };
 
-  if (!isOpen) {
-    return (
-      <Button
-        onClick={onToggle}
-        size="icon"
-        className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg"
-      >
-        <MessageSquare className="h-6 w-6" />
-      </Button>
-    );
-  }
-
   return (
-    <div className="flex h-full w-96 flex-col border-l border-border bg-background">
+    <>
+      {/* Backdrop for floating mode */}
+      {isOpen && useFloatingMode && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40"
+          onClick={onToggle}
+        />
+      )}
+
+      {!isOpen && (
+        <Button
+          onClick={onToggle}
+          size="icon"
+          className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg transition-all duration-300 ease-in-out"
+        >
+          <MessageSquare className="h-6 w-6" />
+        </Button>
+      )}
+      <div className={`flex h-full flex-col border-l border-border bg-background transition-all duration-300 ease-in-out
+        ${useFloatingMode
+          ? `fixed z-50 inset-0 w-full ${isOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}`
+          : `relative z-0 ${isOpen ? 'w-96 opacity-100' : 'w-0 opacity-0 border-l-0 overflow-hidden'}`
+        }
+      `}>
       {/* Chat Header */}
-      <div className="h-[72px] flex items-center border-b border-border px-4 flex-shrink-0">
+      <div className="h-[72px] flex items-center border-b border-border px-4 flex-shrink-0 transition-opacity duration-300">
         <div className="flex items-start justify-between w-full">
           <div className="min-w-0 flex-1 pr-2">
             <h1 className="text-xl font-semibold text-foreground truncate">Search Spare Parts</h1>
@@ -91,7 +118,7 @@ export const ChatInterface = ({ isOpen, onToggle }: ChatInterfaceProps) => {
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 px-6 min-h-0">
+      <ScrollArea className="flex-1 px-6 min-h-0 transition-opacity duration-300">
         <div className="space-y-4 py-6">
           {messages.map((message) => (
             <div
@@ -99,7 +126,7 @@ export const ChatInterface = ({ isOpen, onToggle }: ChatInterfaceProps) => {
               className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
             >
               <div
-                className={`max-w-[80%] rounded-lg px-4 py-3 break-words ${
+                className={`max-w-[80%] rounded-lg px-4 py-3 break-words transition-all duration-200 ease-in-out ${
                   message.role === "user"
                     ? "bg-primary text-primary-foreground"
                     : "bg-muted text-foreground"
@@ -123,7 +150,7 @@ export const ChatInterface = ({ isOpen, onToggle }: ChatInterfaceProps) => {
       </ScrollArea>
 
       {/* Input Area */}
-      <div className="border-t border-border p-4 flex-shrink-0">
+      <div className="border-t border-border p-4 flex-shrink-0 transition-opacity duration-300">
         <div className="flex items-center gap-2 mb-2">
           <Toggle
             pressed={searchByPartNumber}
@@ -153,5 +180,6 @@ export const ChatInterface = ({ isOpen, onToggle }: ChatInterfaceProps) => {
         </div>
       </div>
     </div>
+    </>
   );
 };
