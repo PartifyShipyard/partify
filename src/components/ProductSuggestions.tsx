@@ -622,19 +622,19 @@ export const ProductSuggestions = () => {
           {sortedProducts.map((product) => (
             <Card key={product.id} className="overflow-hidden">
               <CardHeader className="p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex gap-3 flex-1 min-w-0 items-center">
+                <div className="flex items-stretch justify-between gap-3">
+                  <div className="flex gap-3 flex-1 min-w-0">
                     {expandedId !== product.id && (
                       <img
                         src={product.image}
                         alt={product.name}
-                        className="h-16 w-16 rounded-md object-cover flex-shrink-0"
+                        className="h-full w-16 rounded-md object-cover flex-shrink-0"
                         onError={(e) => {
                           e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect fill='%23f0f0f0' width='100' height='100'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23999' font-family='sans-serif' font-size='14'%3ENo Image%3C/text%3E%3C/svg%3E";
                         }}
                       />
                     )}
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 flex flex-col justify-center">
                       <div className="flex items-center gap-2">
                         <CardTitle className="text-base">{product.name}</CardTitle>
                         {product.validatedByManufacturer && (
