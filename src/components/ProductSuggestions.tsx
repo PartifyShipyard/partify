@@ -142,7 +142,7 @@ export const ProductSuggestions = () => {
       </div>
 
       {/* Controls: Filtering and Sorting */}
-      <div className="border-b border-border h-[60px] flex items-center px-4">
+      <div className="sticky top-0 z-10 bg-card border-b border-border h-[60px] flex items-center px-4">
         <div className="flex items-center justify-between w-full">
           <Select value={sortBy} onValueChange={setSortBy}>
             <SelectTrigger className="w-[180px] h-9">
