@@ -830,7 +830,7 @@ export const ProductSuggestions = () => {
                   </div>
 
                   <div className="mb-3 space-y-2">
-                    <div className="flex items-start justify-between">
+                    <div className="flex items-end justify-between">
                       <div className="flex flex-col gap-1">
                         <p className="text-xs text-muted-foreground">Ships from: {product.shippingCountry}</p>
                         <p className="text-xs text-muted-foreground">Stock: {product.stock}</p>
