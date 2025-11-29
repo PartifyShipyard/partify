@@ -70,22 +70,22 @@ export const ChatInterface = ({ isOpen, onToggle }: ChatInterfaceProps) => {
   }
 
   return (
-    <div className="flex h-screen w-96 flex-col border-l border-border bg-background">
+    <div className="flex h-full w-96 flex-col border-l border-border bg-background">
       {/* Chat Header */}
-      <div className="h-[72px] flex items-center border-b border-border px-4">
+      <div className="h-[72px] flex items-center border-b border-border px-4 flex-shrink-0">
         <div className="flex items-start justify-between w-full">
-          <div>
-            <h1 className="text-xl font-semibold text-foreground">Search Spare Parts</h1>
-            <p className="text-sm text-muted-foreground">Describe what you need and I'll help you find it</p>
+          <div className="min-w-0 flex-1 pr-2">
+            <h1 className="text-xl font-semibold text-foreground truncate">Search Spare Parts</h1>
+            <p className="text-sm text-muted-foreground truncate">Describe what you need and I'll help you find it</p>
           </div>
-          <Button variant="ghost" size="icon" onClick={onToggle}>
+          <Button variant="ghost" size="icon" onClick={onToggle} className="flex-shrink-0">
             <X className="h-4 w-4" />
           </Button>
         </div>
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 px-6">
+      <ScrollArea className="flex-1 px-6 min-h-0">
         <div className="space-y-4 py-6">
           {messages.map((message) => (
             <div
@@ -93,13 +93,13 @@ export const ChatInterface = ({ isOpen, onToggle }: ChatInterfaceProps) => {
               className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
             >
               <div
-                className={`max-w-[80%] rounded-lg px-4 py-3 ${
+                className={`max-w-[80%] rounded-lg px-4 py-3 break-words ${
                   message.role === "user"
                     ? "bg-primary text-primary-foreground"
                     : "bg-muted text-foreground"
                 }`}
               >
-                <p className="text-sm">{message.content}</p>
+                <p className="text-sm break-words">{message.content}</p>
                 <p className="mt-1 text-xs opacity-70">
                   {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                 </p>
@@ -117,7 +117,7 @@ export const ChatInterface = ({ isOpen, onToggle }: ChatInterfaceProps) => {
       </ScrollArea>
 
       {/* Input Area */}
-      <div className="border-t border-border p-4">
+      <div className="border-t border-border p-4 flex-shrink-0">
         <div className="flex gap-2">
           <Input
             value={input}
