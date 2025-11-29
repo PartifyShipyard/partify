@@ -732,8 +732,12 @@ export const ProductSuggestions = () => {
                       <CardTitle className="text-base leading-none">{product.name}</CardTitle>
                       <p className="text-sm text-muted-foreground">{product.brand}</p>
                       <p className="mt-1 text-xs text-muted-foreground">#{product.partNumber}</p>
-                      <p className="text-xs text-muted-foreground">Ships from: {product.shippingCountry}</p>
-                      <p className="text-xs text-muted-foreground">Stock: {product.stock}</p>
+                      {expandedId !== product.id && (
+                        <>
+                          <p className="text-xs text-muted-foreground">Ships from: {product.shippingCountry}</p>
+                          <p className="text-xs text-muted-foreground">Stock: {product.stock}</p>
+                        </>
+                      )}
                     </div>
                   </div>
                   {expandedId !== product.id && (
