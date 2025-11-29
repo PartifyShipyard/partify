@@ -29,7 +29,7 @@ export const ChatSidebar = ({ isCollapsed, onToggle }: ChatSidebarProps) => {
   return (
     <div className={`flex h-screen flex-col border-r border-border bg-card transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'}`}>
       {/* Header */}
-      <div className={`flex items-center h-[72px] px-4 ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
+      <div className={`flex items-center h-[73px] px-4 ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
         {!isCollapsed && <h2 className="text-lg font-semibold text-foreground">Partify</h2>}
         <div className={`flex gap-1 ${isCollapsed ? 'flex-col' : ''}`}>
           <Button variant="ghost" size="icon" onClick={onToggle}>
