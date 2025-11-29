@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { ChevronDown, ChevronUp, ExternalLink, ShoppingCart, X, Filter, CheckCircle, ArrowUpDown, Plus } from "lucide-react";
+import { ChevronDown, ChevronUp, ExternalLink, ShoppingCart, X, Filter, CheckCircle, ArrowUpDown, Plus, Maximize2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -29,6 +30,7 @@ interface Product {
   validatedByManufacturer: boolean;
   availability: "in-stock" | "limited" | "out-of-stock";
   image: string;
+  images: string[];
   description: string;
   compatibleModels: string[];
 }
@@ -61,6 +63,11 @@ const mockProducts: Product[] = [
     validatedByManufacturer: true,
     availability: "in-stock",
     image: "https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=400",
+    images: [
+      "https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=400",
+      "https://images.unsplash.com/photo-1592286927505-2fd0945e0fef?w=400",
+      "https://images.unsplash.com/photo-1611472173362-3f53dbd65d80?w=400"
+    ],
     description: "Original quality OLED replacement display with digitizer assembly",
     compatibleModels: ["iPhone 14 Pro", "iPhone 14 Pro Max"],
   },
@@ -75,6 +82,10 @@ const mockProducts: Product[] = [
     validatedByManufacturer: false,
     availability: "in-stock",
     image: "https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=400",
+    images: [
+      "https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=400",
+      "https://images.unsplash.com/photo-1585790050230-5dd28404f8db?w=400"
+    ],
     description: "3900mAh replacement battery with installation tools",
     compatibleModels: ["Samsung Galaxy S23", "Samsung Galaxy S23+"],
   },
@@ -89,6 +100,11 @@ const mockProducts: Product[] = [
     validatedByManufacturer: true,
     availability: "limited",
     image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400",
+    images: [
+      "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400",
+      "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400",
+      "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=400"
+    ],
     description: "OEM quality battery with all necessary tools and adhesive strips",
     compatibleModels: ["MacBook Pro 16-inch M1 2021", "MacBook Pro 16-inch M2 2023"],
   },
@@ -103,6 +119,10 @@ const mockProducts: Product[] = [
     validatedByManufacturer: true,
     availability: "in-stock",
     image: "https://images.unsplash.com/photo-1591290619762-c588e5b76c19?w=400",
+    images: [
+      "https://images.unsplash.com/photo-1591290619762-c588e5b76c19?w=400",
+      "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=400"
+    ],
     description: "Replacement charging port flex cable assembly for USB-C devices",
     compatibleModels: ["Samsung Galaxy S21-S24", "Google Pixel 6-8", "OnePlus 9-11"],
   },
@@ -117,6 +137,10 @@ const mockProducts: Product[] = [
     validatedByManufacturer: true,
     availability: "in-stock",
     image: "https://images.unsplash.com/photo-1585790050230-5dd28404f8db?w=400",
+    images: [
+      "https://images.unsplash.com/photo-1585790050230-5dd28404f8db?w=400",
+      "https://images.unsplash.com/photo-1611472173362-3f53dbd65d80?w=400"
+    ],
     description: "12MP rear camera replacement module with flex cable",
     compatibleModels: ["iPad Pro 11-inch 2020-2022", "iPad Pro 12.9-inch 2020-2022"],
   },
@@ -131,6 +155,10 @@ const mockProducts: Product[] = [
     validatedByManufacturer: false,
     availability: "in-stock",
     image: "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=400",
+    images: [
+      "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=400",
+      "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400"
+    ],
     description: "Universal laptop speaker set with connection cables",
     compatibleModels: ["HP Pavilion 15", "Dell Inspiron 15", "Lenovo IdeaPad"],
   },
@@ -145,6 +173,10 @@ const mockProducts: Product[] = [
     validatedByManufacturer: true,
     availability: "in-stock",
     image: "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?w=400",
+    images: [
+      "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?w=400",
+      "https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=400"
+    ],
     description: "Professional phone repair toolkit with precision screwdrivers and pry tools",
     compatibleModels: ["iPhone All Models", "Samsung Galaxy All Models", "Google Pixel All Models"],
   },
@@ -159,6 +191,9 @@ const mockProducts: Product[] = [
     validatedByManufacturer: true,
     availability: "limited",
     image: "https://images.unsplash.com/photo-1585366119957-e9730b6d0f60?w=400",
+    images: [
+      "https://images.unsplash.com/photo-1585366119957-e9730b6d0f60?w=400"
+    ],
     description: "Pre-cut adhesive strips for display and battery replacements",
     compatibleModels: ["iPhone 12-15", "Samsung Galaxy S20-S24", "Google Pixel 6-8"],
   },
@@ -173,6 +208,10 @@ const mockProducts: Product[] = [
     validatedByManufacturer: false,
     availability: "in-stock",
     image: "https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?w=400",
+    images: [
+      "https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?w=400",
+      "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=400"
+    ],
     description: "Complete button set for Joy-Con controller repair",
     compatibleModels: ["Nintendo Switch Original", "Nintendo Switch OLED"],
   },
@@ -187,6 +226,10 @@ const mockProducts: Product[] = [
     validatedByManufacturer: true,
     availability: "in-stock",
     image: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400",
+    images: [
+      "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400",
+      "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400"
+    ],
     description: "US layout laptop keyboard with backlight support",
     compatibleModels: ["HP ProBook 450", "Dell Latitude 5420", "Lenovo ThinkPad E15"],
   },
@@ -201,6 +244,7 @@ export const ProductSuggestions = () => {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [sortBy, setSortBy] = useState<string>("default");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productFormSchema),
@@ -281,6 +325,7 @@ export const ProductSuggestions = () => {
       validatedByManufacturer: data.validatedByManufacturer,
       availability: data.availability,
       image: data.image,
+      images: [data.image],
       description: data.description,
       compatibleModels: data.compatibleModels.split(',').map(m => m.trim()),
     };
@@ -686,14 +731,32 @@ export const ProductSuggestions = () => {
 
               {expandedId === product.id && (
                 <CardContent className="p-4 pt-0">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="mb-3 h-32 w-full rounded-lg object-cover"
-                    onError={(e) => {
-                      e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200' viewBox='0 0 400 200'%3E%3Crect fill='%23f0f0f0' width='400' height='200'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23999' font-family='sans-serif' font-size='16'%3ENo Image Available%3C/text%3E%3C/svg%3E";
-                    }}
-                  />
+                  <Carousel className="mb-3">
+                    <CarouselContent>
+                      {product.images.map((img, index) => (
+                        <CarouselItem key={index}>
+                          <div 
+                            className="relative group cursor-pointer"
+                            onClick={() => setFullscreenImage(img)}
+                          >
+                            <img
+                              src={img}
+                              alt={`${product.name} - Image ${index + 1}`}
+                              className="h-48 w-full rounded-lg object-cover"
+                              onError={(e) => {
+                                e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200' viewBox='0 0 400 200'%3E%3Crect fill='%23f0f0f0' width='400' height='200'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23999' font-family='sans-serif' font-size='16'%3ENo Image Available%3C/text%3E%3C/svg%3E";
+                              }}
+                            />
+                            <div className="absolute inset-0 bg-background/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+                              <Maximize2 className="h-8 w-8 text-foreground" />
+                            </div>
+                          </div>
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    <CarouselPrevious className="left-2" />
+                    <CarouselNext className="right-2" />
+                  </Carousel>
                   <p className="mb-3 text-sm text-muted-foreground">{product.description}</p>
 
                   <div className="mb-3 space-y-2">
@@ -742,6 +805,22 @@ export const ProductSuggestions = () => {
           ))}
         </div>
       </ScrollArea>
+
+      {/* Fullscreen Image Dialog */}
+      <Dialog open={!!fullscreenImage} onOpenChange={() => setFullscreenImage(null)}>
+        <DialogContent className="max-w-4xl w-[90vw] h-[90vh] p-0">
+          <div className="relative w-full h-full flex items-center justify-center bg-background p-4">
+            <img
+              src={fullscreenImage || ""}
+              alt="Full size product image"
+              className="max-w-full max-h-full object-contain rounded-lg"
+              onError={(e) => {
+                e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200' viewBox='0 0 400 200'%3E%3Crect fill='%23f0f0f0' width='400' height='200'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23999' font-family='sans-serif' font-size='16'%3ENo Image Available%3C/text%3E%3C/svg%3E";
+              }}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
