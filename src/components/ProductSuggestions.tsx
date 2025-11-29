@@ -727,12 +727,7 @@ export const ProductSuggestions = () => {
                 <div className="flex items-stretch justify-between gap-3">
                   <div className="flex gap-3 flex-1 min-w-0">
                     <div className="flex-1 min-w-0 flex flex-col justify-center">
-                      <div className="flex items-center gap-2">
-                        <CardTitle className="text-base leading-none">{product.name}</CardTitle>
-                        {product.validatedByManufacturer && (
-                          <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
-                        )}
-                      </div>
+                      <CardTitle className="text-base leading-none">{product.name}</CardTitle>
                       <p className="text-sm text-muted-foreground">{product.brand}</p>
                       <p className="mt-1 text-xs text-muted-foreground">#{product.partNumber}</p>
                       <p className="text-xs text-muted-foreground">Ships from: {product.shippingCountry}</p>
@@ -742,8 +737,13 @@ export const ProductSuggestions = () => {
                   {expandedId !== product.id && (
                     <div className="flex flex-col gap-2 flex-shrink-0">
                       <div className="text-right space-y-0.5">
-                        <div className="text-xl font-bold text-foreground">
-                          €{(product.price + product.shippingCost).toFixed(2)}
+                        <div className="flex items-center justify-end gap-1.5">
+                          <div className="text-xl font-bold text-foreground">
+                            €{(product.price + product.shippingCost).toFixed(2)}
+                          </div>
+                          {product.validatedByManufacturer && (
+                            <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
+                          )}
                         </div>
                         <div className="text-xs text-muted-foreground">
                           €{product.price.toFixed(2)} + €{product.shippingCost.toFixed(2)} ship
@@ -836,8 +836,13 @@ export const ProductSuggestions = () => {
                         <p className="text-xs text-muted-foreground">Stock: {product.stock}</p>
                       </div>
                       <div className="text-right">
-                        <div className="text-xl font-bold text-foreground">
-                          €{product.price.toFixed(2)}
+                        <div className="flex items-center justify-end gap-1.5">
+                          <div className="text-xl font-bold text-foreground">
+                            €{product.price.toFixed(2)}
+                          </div>
+                          {product.validatedByManufacturer && (
+                            <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
+                          )}
                         </div>
                         <div className="text-xs text-muted-foreground">
                           + €{product.shippingCost.toFixed(2)} shipping
