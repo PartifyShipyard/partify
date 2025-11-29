@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { ChevronDown, ChevronUp, ExternalLink, ShoppingCart, X, Filter, CheckCircle, ArrowUpDown, Plus, Maximize2, MessageSquare } from "lucide-react";
+import { useState, useEffect, useMemo, useRef } from "react";
+import { ChevronDown, ChevronUp, ExternalLink, X, Filter, CheckCircle, ArrowUpDown, Plus, Maximize2, MessageSquare, Sparkles } from "lucide-react";
 import { useProducts } from "@/hooks/useProducts";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -20,27 +20,20 @@ import * as z from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
+import type { Product as ApiProduct } from "@/services/api";
 
-interface Product {
-  id: number;
-  name: string;
-  partNumber: string;
-  brand: string;
-  price: number;
-  shippingCost: number;
-  estimatedShipping: string;
-  validatedByManufacturer: boolean;
-  availability: string;
-  purchasingUrl?: string;
-  image?: string;
-  images: string[];
-  description: string;
-  compatibleModels: string[];
-  shippingCountry: string;
-  stock: number;
-  createdAt?: string;
-  updatedAt?: string;
-}
+type Product = ApiProduct;
+
+const THINKING_MESSAGES = [
+  "Scoping suppliers & validating SKUs",
+  "Cross-checking live stock and shipping lanes",
+  "Optimizing total landed cost for you",
+];
+
+const AGENTIC_BASE_DELAY = 1800;
+const AGENTIC_STEP_DELAY = 600;
+const AGENTIC_DELAY_JITTER = 2800;
 
 const productFormSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
@@ -70,13 +63,29 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen, products: externa
   const { toast } = useToast();
   const { products: apiProducts, isLoading: isProductLoading, createProduct } = useProducts();
   const [products, setProducts] = useState<Product[]>([]);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<number | null>(null);
   const [selectedModels, setSelectedModels] = useState<string[]>([]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [sortBy, setSortBy] = useState<string>("default");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
+  const [agenticQueue, setAgenticQueue] = useState<Product[]>([]);
+  const [visibleAgenticIds, setVisibleAgenticIds] = useState<number[]>([]);
+  const [isAgentThinking, setIsAgentThinking] = useState(false);
+  const [thinkingStep, setThinkingStep] = useState(0);
+  const revealTimeoutsRef = useRef<number[]>([]);
+
+  const clearRevealTimeouts = () => {
+    revealTimeoutsRef.current.forEach((timeoutId) => window.clearTimeout(timeoutId));
+    revealTimeoutsRef.current = [];
+  };
+
+  useEffect(() => {
+    return () => {
+      clearRevealTimeouts();
+    };
+  }, []);
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productFormSchema),
@@ -147,6 +156,65 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen, products: externa
     setSelectedBrands([]);
   };
 
+  const agenticIdSet = useMemo(
+    () => new Set(agenticQueue.map((product) => product.id)),
+    [agenticQueue]
+  );
+  const visibleAgenticSet = useMemo(
+    () => new Set(visibleAgenticIds),
+    [visibleAgenticIds]
+  );
+  const isRevealingAgentic = agenticQueue.length > 0 && visibleAgenticIds.length < agenticQueue.length;
+  const showThinkingCard = isAgentThinking || isRevealingAgentic;
+  const thinkingMessage = THINKING_MESSAGES[thinkingStep];
+
+  useEffect(() => {
+    clearRevealTimeouts();
+    setVisibleAgenticIds([]);
+
+    if (!externalProducts || externalProducts.length === 0) {
+      setAgenticQueue([]);
+      setIsAgentThinking(false);
+      return;
+    }
+
+    const nextQueue = [...externalProducts];
+    setAgenticQueue(nextQueue);
+    setIsAgentThinking(true);
+    setThinkingStep(Math.floor(Math.random() * THINKING_MESSAGES.length));
+
+    nextQueue.forEach((product, index) => {
+      const jitter = Math.floor(Math.random() * AGENTIC_DELAY_JITTER);
+      const delay = AGENTIC_BASE_DELAY + index * AGENTIC_STEP_DELAY + jitter;
+      const timeoutId = window.setTimeout(() => {
+        setVisibleAgenticIds((prev) => {
+          if (prev.includes(product.id)) {
+            return prev;
+          }
+          const next = [...prev, product.id];
+          if (next.length === nextQueue.length) {
+            setIsAgentThinking(false);
+          }
+          return next;
+        });
+      }, delay);
+      revealTimeoutsRef.current.push(timeoutId);
+    });
+  }, [externalProducts]);
+
+  useEffect(() => {
+    if (!isAgentThinking) {
+      setThinkingStep(0);
+      return;
+    }
+
+    const intervalId = window.setInterval(() => {
+      setThinkingStep((prev) => (prev + 1) % THINKING_MESSAGES.length);
+    }, 1200);
+
+    return () => window.clearInterval(intervalId);
+  }, [isAgentThinking]);
+
   // Sync API products and external products (from chat) with local state
   useEffect(() => {
     console.log('ProductSuggestions: Syncing products', {
@@ -155,7 +223,7 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen, products: externa
     });
     
     // Merge API products and external products (from chat suggestions)
-    const mergedProducts = [...apiProducts];
+    const mergedProducts: Product[] = [...apiProducts];
     
     if (externalProducts && externalProducts.length > 0) {
       // Add external products that aren't already in the list
@@ -570,97 +638,144 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen, products: externa
 
       {/* Products List */}
       <ScrollArea className="flex-1">
-        <div className="space-y-3 p-4">
-          {sortedProducts.map((product) => (
-            <Card key={product.id} className="overflow-hidden">
-              <CardHeader className="p-4">
-                <div className="flex items-stretch justify-between gap-3">
-                  <div className="flex gap-3 flex-1 min-w-0">
-                    <div className="flex-1 min-w-0 flex flex-col justify-center">
-                      <CardTitle className="text-base leading-none">{product.name}</CardTitle>
-                      <p className="text-sm text-muted-foreground">{product.brand}</p>
-                      <p className="mt-1 text-xs text-muted-foreground">#{product.partNumber}</p>
-                      {expandedId !== product.id && (
-                        <>
-                          <p className="text-xs text-muted-foreground">Ships from: {product.shippingCountry}</p>
-                          <p className="text-xs text-muted-foreground">Stock: {product.stock}</p>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                  {expandedId !== product.id && (
-                    <div className="flex flex-col gap-2 flex-shrink-0 justify-center">
-                      <div className="text-right space-y-0.5">
-                        <div className="flex items-center justify-end gap-1.5">
-                          {product.price > 0 ? (
-                          <div className="text-xl font-bold text-foreground">
-                            €{(product.price + product.shippingCost).toFixed(2)}
-                          </div>
-                          ) : (
-                            <div className="text-sm font-medium text-muted-foreground">
-                              Ask Manufacturer
-                            </div>
-                          )}
-                          {product.validatedByManufacturer && (
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Validated by manufacturer</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          )}
-                        </div>
-                        {product.price > 0 && (
-                          <>
-                        <div className="text-xs text-muted-foreground">
-                          €{product.price.toFixed(2)} + €{product.shippingCost.toFixed(2)} ship
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {product.estimatedShipping}
-                        </div>
-                          </>
-                        )}
-                      </div>
-                      <div className="flex gap-1 mt-1">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          className="flex-1"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (product.purchasingUrl) {
-                              window.open(product.purchasingUrl, '_blank');
-                            }
-                          }}
-                          disabled={!product.purchasingUrl}
-                        >
-                          <ExternalLink className="h-3 w-3 mr-1" />
-                          Buy
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setExpandedId(expandedId === product.id ? null : product.id)}
-                        >
-                          <ChevronDown className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                  {expandedId === product.id && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="flex-shrink-0"
-                      onClick={() => setExpandedId(expandedId === product.id ? null : product.id)}
-                    >
-                      <ChevronUp className="h-4 w-4" />
-                    </Button>
+        <div className="space-y-6 p-4">
+          {showThinkingCard && (
+            <div className="border rounded-lg overflow-hidden bg-card p-4">
+              <div className="flex items-center gap-3">
+                <div className="relative h-12 w-12">
+                  <span className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />
+                  <span className="relative flex h-12 w-12 items-center justify-center rounded-full bg-primary/30 text-primary">
+                    <Sparkles className="h-5 w-5" />
+                  </span>
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-primary">Agent is thinking</p>
+                  <p className="text-xs text-muted-foreground">{thinkingMessage}</p>
+                  {agenticQueue.length > 0 && (
+                    <p className="mt-1 text-[11px] text-muted-foreground">
+                      {visibleAgenticIds.length}/{agenticQueue.length} suggestions ready
+                    </p>
                   )}
                 </div>
-              </CardHeader>
+                <div className="flex items-center gap-1">
+                  <span className="h-2 w-2 rounded-full bg-primary/70 animate-bounce" />
+                  <span className="h-2 w-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: "150ms" }} />
+                  <span className="h-2 w-2 rounded-full bg-primary/50 animate-bounce" style={{ animationDelay: "300ms" }} />
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-3">
+            {sortedProducts.map((product) => {
+              const isAgentic = agenticIdSet.has(product.id);
+              if (isAgentic && !visibleAgenticSet.has(product.id)) {
+                return (
+                  <div
+                    key={`placeholder-${product.id}`}
+                    className="h-[132px] rounded-2xl border border-dashed border-primary/30 bg-primary/5 animate-pulse"
+                  />
+                );
+              }
+
+              return (
+                <Card
+                  key={product.id}
+                  className={cn("overflow-hidden")}
+                >
+                  <CardHeader className="p-4">
+                    <div className="flex items-stretch justify-between gap-3">
+                      <div className="flex gap-3 flex-1 min-w-0">
+                        <div className="flex-1 min-w-0 flex flex-col justify-center">
+                          <CardTitle className="text-base leading-none">{product.name}</CardTitle>
+                          <p className="text-sm text-muted-foreground">{product.brand}</p>
+                          <p className="mt-1 text-xs text-muted-foreground">#{product.partNumber}</p>
+                          {isAgentic && (
+                            <Badge className="mt-2 w-fit border border-primary/30 bg-primary/15 text-[10px] font-semibold uppercase tracking-wide text-primary">
+                              Agent pick
+                            </Badge>
+                          )}
+                          {expandedId !== product.id && (
+                            <>
+                              <p className="text-xs text-muted-foreground">Ships from: {product.shippingCountry}</p>
+                              <p className="text-xs text-muted-foreground">Stock: {product.stock}</p>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      {expandedId !== product.id && (
+                        <div className="flex flex-col gap-2 flex-shrink-0">
+                          <div className="text-right space-y-0.5">
+                            <div className="flex items-center justify-end gap-1.5">
+                              {product.price > 0 ? (
+                                <div className="text-xl font-bold text-foreground">
+                                  €{(product.price + product.shippingCost).toFixed(2)}
+                                </div>
+                              ) : (
+                                <div className="text-sm font-medium text-muted-foreground">
+                                  Ask Manufacturer
+                                </div>
+                              )}
+                              {product.validatedByManufacturer && (
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Validated by manufacturer</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              )}
+                            </div>
+                            {product.price > 0 && (
+                              <>
+                                <div className="text-xs text-muted-foreground">
+                                  €{product.price.toFixed(2)} + €{product.shippingCost.toFixed(2)} ship
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  {product.estimatedShipping}
+                                </div>
+                              </>
+                            )}
+                          </div>
+                          <div className="flex gap-1 mt-1">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="flex-1"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (product.purchasingUrl) {
+                                  window.open(product.purchasingUrl, "_blank");
+                                }
+                              }}
+                              disabled={!product.purchasingUrl}
+                            >
+                              <ExternalLink className="h-3 w-3 mr-1" />
+                              Buy
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setExpandedId(expandedId === product.id ? null : product.id)}
+                            >
+                              <ChevronDown className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                      {expandedId === product.id && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="flex-shrink-0"
+                          onClick={() => setExpandedId(expandedId === product.id ? null : product.id)}
+                        >
+                          <ChevronUp className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </CardHeader>
 
               {expandedId === product.id && (
                 <CardContent className="p-4 pt-0">
@@ -771,8 +886,10 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen, products: externa
                   </div>
                 </CardContent>
               )}
-            </Card>
-          ))}
+                </Card>
+              );
+            })}
+          </div>
         </div>
       </ScrollArea>
 
