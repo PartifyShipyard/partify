@@ -29,7 +29,6 @@ interface Product {
   estimatedShipping: string;
   validatedByManufacturer: boolean;
   availability: "in-stock" | "limited" | "out-of-stock";
-  stockAmount: number;
   image: string;
   images: string[];
   description: string;
@@ -63,7 +62,6 @@ const mockProducts: Product[] = [
     estimatedShipping: "2-3 business days",
     validatedByManufacturer: true,
     availability: "in-stock",
-    stockAmount: 45,
     image: "https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=400",
     images: [
       "https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=400",
@@ -83,7 +81,6 @@ const mockProducts: Product[] = [
     estimatedShipping: "3-5 business days",
     validatedByManufacturer: false,
     availability: "in-stock",
-    stockAmount: 120,
     image: "https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=400",
     images: [
       "https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=400",
@@ -102,7 +99,6 @@ const mockProducts: Product[] = [
     estimatedShipping: "1-2 business days",
     validatedByManufacturer: true,
     availability: "limited",
-    stockAmount: 8,
     image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400",
     images: [
       "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400",
@@ -122,7 +118,6 @@ const mockProducts: Product[] = [
     estimatedShipping: "2-4 business days",
     validatedByManufacturer: true,
     availability: "in-stock",
-    stockAmount: 85,
     image: "https://images.unsplash.com/photo-1591290619762-c588e5b76c19?w=400",
     images: [
       "https://images.unsplash.com/photo-1591290619762-c588e5b76c19?w=400",
@@ -141,7 +136,6 @@ const mockProducts: Product[] = [
     estimatedShipping: "1-2 business days",
     validatedByManufacturer: true,
     availability: "in-stock",
-    stockAmount: 32,
     image: "https://images.unsplash.com/photo-1585790050230-5dd28404f8db?w=400",
     images: [
       "https://images.unsplash.com/photo-1585790050230-5dd28404f8db?w=400",
@@ -160,7 +154,6 @@ const mockProducts: Product[] = [
     estimatedShipping: "3-5 business days",
     validatedByManufacturer: false,
     availability: "in-stock",
-    stockAmount: 67,
     image: "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=400",
     images: [
       "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=400",
@@ -179,7 +172,6 @@ const mockProducts: Product[] = [
     estimatedShipping: "2-3 business days",
     validatedByManufacturer: true,
     availability: "in-stock",
-    stockAmount: 150,
     image: "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?w=400",
     images: [
       "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?w=400",
@@ -198,7 +190,6 @@ const mockProducts: Product[] = [
     estimatedShipping: "1-2 business days",
     validatedByManufacturer: true,
     availability: "limited",
-    stockAmount: 12,
     image: "https://images.unsplash.com/photo-1585366119957-e9730b6d0f60?w=400",
     images: [
       "https://images.unsplash.com/photo-1585366119957-e9730b6d0f60?w=400"
@@ -216,7 +207,6 @@ const mockProducts: Product[] = [
     estimatedShipping: "3-5 business days",
     validatedByManufacturer: false,
     availability: "in-stock",
-    stockAmount: 93,
     image: "https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?w=400",
     images: [
       "https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?w=400",
@@ -235,7 +225,6 @@ const mockProducts: Product[] = [
     estimatedShipping: "2-3 business days",
     validatedByManufacturer: true,
     availability: "in-stock",
-    stockAmount: 54,
     image: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400",
     images: [
       "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400",
@@ -335,7 +324,6 @@ export const ProductSuggestions = () => {
       estimatedShipping: data.estimatedShipping,
       validatedByManufacturer: data.validatedByManufacturer,
       availability: data.availability,
-      stockAmount: 0,
       image: data.image,
       images: [data.image],
       description: data.description,
@@ -354,7 +342,7 @@ export const ProductSuggestions = () => {
   const getAvailabilityColor = (availability: Product["availability"]) => {
     switch (availability) {
       case "in-stock":
-        return "bg-accent/10 text-accent-foreground";
+        return "bg-green-500/10 text-green-700 dark:text-green-400";
       case "limited":
         return "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400";
       case "out-of-stock":
@@ -784,14 +772,9 @@ export const ProductSuggestions = () => {
 
                   <div className="mb-3 space-y-2">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Badge className={getAvailabilityColor(product.availability)}>
-                          {product.availability.replace("-", " ")}
-                        </Badge>
-                        <span className="text-xs text-muted-foreground">
-                          {product.stockAmount} in stock
-                        </span>
-                      </div>
+                      <Badge className={getAvailabilityColor(product.availability)}>
+                        {product.availability.replace("-", " ")}
+                      </Badge>
                       <div className="text-right">
                         <div className="text-xl font-bold text-foreground">
                           €{product.price.toFixed(2)}
