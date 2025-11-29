@@ -837,9 +837,15 @@ export const ProductSuggestions = () => {
                     <div className="flex flex-wrap gap-1 items-center">
                       <span className="text-xs font-medium text-muted-foreground">Compatible:</span>
                       {product.compatibleModels.map((model) => (
-                        <Badge key={model} variant="secondary" className="text-xs">
+                        <Button
+                          key={model}
+                          variant="secondary"
+                          size="sm"
+                          className="h-auto py-0.5 px-2 text-xs"
+                          disabled
+                        >
                           {model}
-                        </Badge>
+                        </Button>
                       ))}
                     </div>
                   </div>
