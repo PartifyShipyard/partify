@@ -707,7 +707,7 @@ export const ProductSuggestions = () => {
                   <p className="mb-3 text-sm text-muted-foreground">{product.description}</p>
 
                   <div className="mb-3 space-y-2">
-                    <div className="flex flex-wrap gap-1">
+                    <div className="flex flex-wrap gap-1 items-center">
                       <span className="text-xs font-medium text-muted-foreground">Compatible:</span>
                       {product.compatibleModels.map((model) => (
                         <Badge key={model} variant="secondary" className="text-xs">
