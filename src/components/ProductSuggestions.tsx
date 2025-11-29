@@ -98,15 +98,30 @@ export const ProductSuggestions = () => {
           {mockProducts.map((product) => (
             <Card key={product.id} className="overflow-hidden">
               <CardHeader className="p-4">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="text-base">{product.name}</CardTitle>
-                    <p className="text-sm text-muted-foreground">{product.brand}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">#{product.partNumber}</p>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex gap-3 flex-1 min-w-0">
+                    {expandedId !== product.id && (
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="h-16 w-16 rounded-md object-cover flex-shrink-0"
+                      />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <CardTitle className="text-base">{product.name}</CardTitle>
+                      <p className="text-sm text-muted-foreground">{product.brand}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">#{product.partNumber}</p>
+                      {expandedId !== product.id && (
+                        <p className="mt-1 text-lg font-bold text-foreground">
+                          ${product.price.toFixed(2)}
+                        </p>
+                      )}
+                    </div>
                   </div>
                   <Button
                     variant="ghost"
                     size="icon"
+                    className="flex-shrink-0"
                     onClick={() => setExpandedId(expandedId === product.id ? null : product.id)}
                   >
                     {expandedId === product.id ? (
