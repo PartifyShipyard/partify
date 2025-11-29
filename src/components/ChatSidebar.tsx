@@ -138,12 +138,10 @@ export const ChatSidebar = ({ isCollapsed, onToggle }: ChatSidebarProps) => {
       {/* Account Section */}
       <div className="p-3 border-t border-border">
         {!isCollapsed ? (
-          <div className="flex items-center gap-3">
-            <UserProfileDropdown />
-          </div>
+          <UserProfileDropdown showName={true} />
         ) : (
           <div className="flex justify-center">
-            <UserProfileDropdown />
+            <UserProfileDropdown showName={false} />
           </div>
         )}
       </div>
