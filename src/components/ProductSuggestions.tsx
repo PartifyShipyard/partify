@@ -808,7 +808,7 @@ export const ProductSuggestions = () => {
                       {product.images.map((img, index) => (
                         <CarouselItem key={index}>
                           <div 
-                            className="relative group cursor-pointer max-h-[400px] flex items-center justify-center"
+                            className="relative group cursor-pointer h-[400px] flex items-center justify-center"
                             onClick={() => setFullscreenImage(img)}
                           >
                             <img
