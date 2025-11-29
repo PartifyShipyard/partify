@@ -140,29 +140,35 @@ const Auth = () => {
               <TabsTrigger value="signup">Sign Up</TabsTrigger>
             </TabsList>
             <TabsContent value="login">
-              <form onSubmit={handleLogin} className="space-y-4">
+              <form onSubmit={handleLogin} className="space-y-4" autoComplete="off">
                 <div className="space-y-2">
                   <Label htmlFor="login-email">Email</Label>
                   <Input
                     id="login-email"
+                    name="email"
                     type="email"
                     placeholder="you@example.com"
                     value={loginEmail}
                     onChange={(e) => setLoginEmail(e.target.value)}
                     required
                     disabled={isLoading}
+                    autoComplete="email"
+                    data-form-type="other"
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="login-password">Password</Label>
                   <Input
                     id="login-password"
+                    name="password"
                     type="password"
                     placeholder="••••••••"
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
                     required
                     disabled={isLoading}
+                    autoComplete="current-password"
+                    data-form-type="other"
                   />
                 </div>
                 <Button type="submit" className="w-full" disabled={isLoading}>
@@ -171,41 +177,50 @@ const Auth = () => {
               </form>
             </TabsContent>
             <TabsContent value="signup">
-              <form onSubmit={handleSignup} className="space-y-4">
+              <form onSubmit={handleSignup} className="space-y-4" autoComplete="off">
                 <div className="space-y-2">
                   <Label htmlFor="signup-name">Full Name</Label>
                   <Input
                     id="signup-name"
+                    name="fullName"
                     type="text"
                     placeholder="John Doe"
                     value={signupFullName}
                     onChange={(e) => setSignupFullName(e.target.value)}
                     required
                     disabled={isLoading}
+                    autoComplete="name"
+                    data-form-type="other"
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-email">Email</Label>
                   <Input
                     id="signup-email"
+                    name="email"
                     type="email"
                     placeholder="you@example.com"
                     value={signupEmail}
                     onChange={(e) => setSignupEmail(e.target.value)}
                     required
                     disabled={isLoading}
+                    autoComplete="email"
+                    data-form-type="other"
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-password">Password</Label>
                   <Input
                     id="signup-password"
+                    name="password"
                     type="password"
                     placeholder="••••••••"
                     value={signupPassword}
                     onChange={(e) => setSignupPassword(e.target.value)}
                     required
                     disabled={isLoading}
+                    autoComplete="new-password"
+                    data-form-type="other"
                   />
                 </div>
                 <Button type="submit" className="w-full" disabled={isLoading}>
