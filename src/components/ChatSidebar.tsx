@@ -29,7 +29,7 @@ export const ChatSidebar = ({ isCollapsed, onToggle }: ChatSidebarProps) => {
   return (
     <div className={`flex h-screen flex-col border-r border-border bg-card transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'}`}>
       {/* Header */}
-      <div className="flex items-center justify-between p-4">
+      <div className={`flex items-center p-4 ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
         {!isCollapsed && <h2 className="text-lg font-semibold text-foreground">Partify</h2>}
         <div className={`flex gap-1 ${isCollapsed ? 'flex-col' : ''}`}>
           <Button variant="ghost" size="icon" onClick={onToggle}>
@@ -77,7 +77,7 @@ export const ChatSidebar = ({ isCollapsed, onToggle }: ChatSidebarProps) => {
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-2 py-4">
+          <div className="flex flex-col items-center justify-center gap-2 py-4">
             <Button variant="ghost" size="icon" className="h-8 w-8">
               <History className="h-4 w-4" />
             </Button>
@@ -105,7 +105,7 @@ export const ChatSidebar = ({ isCollapsed, onToggle }: ChatSidebarProps) => {
             </Button>
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-2">
+          <div className="flex flex-col items-center justify-center gap-2">
             <Button variant="ghost" size="icon" className="h-8 w-8">
               <User className="h-4 w-4" />
             </Button>
