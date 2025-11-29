@@ -662,12 +662,16 @@ export const ProductSuggestions = () => {
                   </div>
                   {expandedId !== product.id && (
                     <div className="flex flex-col gap-2 flex-shrink-0">
-                      <div className="text-xl font-bold text-foreground">
-                        €{(product.price + product.shippingCost).toFixed(2)}
-                      </div>
-                      <div className="text-xs text-muted-foreground text-right space-y-0.5">
-                        <div>€{product.price.toFixed(2)} + €{product.shippingCost.toFixed(2)} ship</div>
-                        <div>{product.estimatedShipping}</div>
+                      <div className="text-right space-y-0.5">
+                        <div className="text-xl font-bold text-foreground">
+                          €{(product.price + product.shippingCost).toFixed(2)}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          €{product.price.toFixed(2)} + €{product.shippingCost.toFixed(2)} ship
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {product.estimatedShipping}
+                        </div>
                       </div>
                       <div className="flex gap-1 mt-1">
                         <Button 
