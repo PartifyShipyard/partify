@@ -661,7 +661,7 @@ export const ProductSuggestions = () => {
                     </div>
                   </div>
                   {expandedId !== product.id && (
-                    <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                    <div className="flex flex-col gap-2 flex-shrink-0">
                       <div className="text-xl font-bold text-foreground">
                         €{(product.price + product.shippingCost).toFixed(2)}
                       </div>
@@ -669,20 +669,39 @@ export const ProductSuggestions = () => {
                         <div>€{product.price.toFixed(2)} + €{product.shippingCost.toFixed(2)} ship</div>
                         <div>{product.estimatedShipping}</div>
                       </div>
+                      <div className="flex gap-1 mt-1">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="flex-1"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.open(`https://${product.brand.toLowerCase()}.com`, '_blank');
+                          }}
+                        >
+                          <ExternalLink className="h-3 w-3 mr-1" />
+                          Buy
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setExpandedId(expandedId === product.id ? null : product.id)}
+                        >
+                          <ChevronDown className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
                   )}
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="flex-shrink-0"
-                    onClick={() => setExpandedId(expandedId === product.id ? null : product.id)}
-                  >
-                    {expandedId === product.id ? (
+                  {expandedId === product.id && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="flex-shrink-0"
+                      onClick={() => setExpandedId(expandedId === product.id ? null : product.id)}
+                    >
                       <ChevronUp className="h-4 w-4" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4" />
-                    )}
-                  </Button>
+                    </Button>
+                  )}
                 </div>
               </CardHeader>
 
@@ -729,12 +748,13 @@ export const ProductSuggestions = () => {
                   </div>
 
                   <div className="flex gap-2">
-                    <Button className="flex-1" size="sm">
-                      <ShoppingCart className="mr-2 h-3 w-3" />
-                      Add to Cart
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      <ExternalLink className="h-3 w-3" />
+                    <Button 
+                      className="flex-1" 
+                      size="sm"
+                      onClick={() => window.open(`https://${product.brand.toLowerCase()}.com`, '_blank')}
+                    >
+                      <ExternalLink className="mr-2 h-3 w-3" />
+                      Buy from Manufacturer
                     </Button>
                   </div>
                 </CardContent>
