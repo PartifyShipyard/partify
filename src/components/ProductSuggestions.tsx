@@ -131,7 +131,8 @@ export const ProductSuggestions = () => {
                 align="end"
                 sideOffset={8}
               >
-                <div className="space-y-4">
+                <ScrollArea className="max-h-[60vh]">
+                  <div className="space-y-4 pr-4">
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm font-semibold text-foreground">Filters</h3>
                     {(selectedModels.length > 0 || selectedCategories.length > 0) && (
@@ -149,8 +150,7 @@ export const ProductSuggestions = () => {
                       </Button>
                     </CollapsibleTrigger>
                     <CollapsibleContent className="mt-2 animate-accordion-down data-[state=closed]:animate-accordion-up">
-                      <ScrollArea className="max-h-40">
-                        <div className="flex flex-wrap gap-2 pr-4">
+                      <div className="flex flex-wrap gap-2">
                           {allModels.map((model) => (
                             <Badge
                               key={model}
@@ -164,8 +164,7 @@ export const ProductSuggestions = () => {
                               )}
                             </Badge>
                           ))}
-                        </div>
-                      </ScrollArea>
+                      </div>
                     </CollapsibleContent>
                   </Collapsible>
                   
@@ -194,7 +193,8 @@ export const ProductSuggestions = () => {
                       </div>
                     </CollapsibleContent>
                   </Collapsible>
-                </div>
+                  </div>
+                </ScrollArea>
               </PopoverContent>
             </Popover>
             <Button
