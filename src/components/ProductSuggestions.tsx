@@ -64,7 +64,7 @@ export const ProductSuggestions = () => {
   };
 
   return (
-    <div className="flex h-screen w-96 flex-col border-l border-border bg-card">
+    <div className="flex h-screen flex-1 flex-col border-r border-border bg-card">
       {/* Header */}
       <div className="border-b border-border px-4 py-4">
         <h2 className="text-lg font-semibold text-foreground">Suggested Parts</h2>

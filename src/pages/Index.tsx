@@ -7,8 +7,8 @@ const Index = () => {
     <div className="flex h-screen w-full overflow-hidden">
       <ChatSidebar />
       <div className="flex flex-1">
-        <ChatInterface />
         <ProductSuggestions />
+        <ChatInterface />
       </div>
     </div>
   );
