@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Send, Loader2 } from "lucide-react";
+import { MessageSquare, Send, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
@@ -20,7 +20,12 @@ const initialMessages: Message[] = [
   },
 ];
 
-export const ChatInterface = () => {
+interface ChatInterfaceProps {
+  isOpen: boolean;
+  onToggle: () => void;
+}
+
+export const ChatInterface = ({ isOpen, onToggle }: ChatInterfaceProps) => {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -52,12 +57,31 @@ export const ChatInterface = () => {
     }, 1000);
   };
 
+  if (!isOpen) {
+    return (
+      <Button
+        onClick={onToggle}
+        size="icon"
+        className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg"
+      >
+        <MessageSquare className="h-6 w-6" />
+      </Button>
+    );
+  }
+
   return (
-    <div className="flex h-screen w-96 flex-col bg-background">
+    <div className="flex h-screen w-96 flex-col border-l border-border bg-background">
       {/* Chat Header */}
       <div className="border-b border-border px-6 py-4">
-        <h1 className="text-xl font-semibold text-foreground">Search Spare Parts</h1>
-        <p className="text-sm text-muted-foreground">Describe what you need and I'll help you find it</p>
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-xl font-semibold text-foreground">Search Spare Parts</h1>
+            <p className="text-sm text-muted-foreground">Describe what you need and I'll help you find it</p>
+          </div>
+          <Button variant="ghost" size="icon" onClick={onToggle}>
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       {/* Messages */}

@@ -1,8 +1,9 @@
-import { History, Plus, User, Settings } from "lucide-react";
+import { History, Plus, User, Settings, Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useTheme } from "next-themes";
 
 interface ChatHistory {
   id: string;
@@ -18,14 +19,29 @@ const mockHistory: ChatHistory[] = [
 ];
 
 export const ChatSidebar = () => {
+  const { theme, setTheme } = useTheme();
+
   return (
     <div className="flex h-screen w-64 flex-col border-r border-border bg-card">
       {/* Header */}
       <div className="flex items-center justify-between p-4">
         <h2 className="text-lg font-semibold text-foreground">PartsAI</h2>
-        <Button variant="ghost" size="icon">
-          <Plus className="h-4 w-4" />
-        </Button>
+        <div className="flex gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          >
+            {theme === "dark" ? (
+              <Sun className="h-4 w-4" />
+            ) : (
+              <Moon className="h-4 w-4" />
+            )}
+          </Button>
+          <Button variant="ghost" size="icon">
+            <Plus className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       <Separator />

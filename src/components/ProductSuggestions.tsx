@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronDown, ChevronUp, ExternalLink, ShoppingCart } from "lucide-react";
+import { ChevronDown, ChevronUp, ExternalLink, ShoppingCart, Grid3x3, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -51,6 +51,7 @@ const mockProducts: Product[] = [
 
 export const ProductSuggestions = () => {
   const [expandedId, setExpandedId] = useState<string | null>("1");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("list");
 
   const getAvailabilityColor = (availability: Product["availability"]) => {
     switch (availability) {
@@ -67,13 +68,33 @@ export const ProductSuggestions = () => {
     <div className="flex h-screen flex-1 flex-col border-r border-border bg-card">
       {/* Header */}
       <div className="border-b border-border px-4 py-4">
-        <h2 className="text-lg font-semibold text-foreground">Suggested Parts</h2>
-        <p className="text-sm text-muted-foreground">{mockProducts.length} results found</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">Suggested Parts</h2>
+            <p className="text-sm text-muted-foreground">{mockProducts.length} results found</p>
+          </div>
+          <div className="flex gap-1">
+            <Button
+              variant={viewMode === "list" ? "secondary" : "ghost"}
+              size="icon"
+              onClick={() => setViewMode("list")}
+            >
+              <List className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={viewMode === "grid" ? "secondary" : "ghost"}
+              size="icon"
+              onClick={() => setViewMode("grid")}
+            >
+              <Grid3x3 className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
       </div>
 
       {/* Products List */}
       <ScrollArea className="flex-1">
-        <div className="space-y-3 p-4">
+        <div className={viewMode === "grid" ? "grid grid-cols-2 gap-3 p-4" : "space-y-3 p-4"}>
           {mockProducts.map((product) => (
             <Card key={product.id} className="overflow-hidden">
               <CardHeader className="p-4">
