@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useTheme } from "next-themes";
 import { useState } from "react";
+import { UserProfileDropdown } from "./UserProfileDropdown";
 
 interface ChatHistory {
   id: string;
@@ -137,28 +138,12 @@ export const ChatSidebar = ({ isCollapsed, onToggle }: ChatSidebarProps) => {
       {/* Account Section */}
       <div className="p-3 border-t border-border">
         {!isCollapsed ? (
-          <div className="flex items-center gap-3 rounded-lg p-2 hover:bg-accent">
-            <Avatar className="h-8 w-8">
-              <AvatarFallback className="bg-primary text-primary-foreground">
-                <User className="h-4 w-4" />
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 text-sm">
-              <div className="font-medium text-foreground">Repair Shop</div>
-              <div className="text-xs text-muted-foreground">Pro Account</div>
-            </div>
-            <Button variant="ghost" size="icon">
-              <Settings className="h-4 w-4" />
-            </Button>
+          <div className="flex items-center gap-3">
+            <UserProfileDropdown />
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center gap-2">
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <User className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <Settings className="h-4 w-4" />
-            </Button>
+          <div className="flex justify-center">
+            <UserProfileDropdown />
           </div>
         )}
       </div>
