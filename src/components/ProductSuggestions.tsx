@@ -672,7 +672,7 @@ export const ProductSuggestions = () => {
                           Buy
                         </Button>
                         <Button
-                          variant="default"
+                          variant="ghost"
                           size="sm"
                           onClick={() => setExpandedId(expandedId === product.id ? null : product.id)}
                         >
@@ -683,7 +683,7 @@ export const ProductSuggestions = () => {
                   )}
                   {expandedId === product.id && (
                     <Button
-                      variant="default"
+                      variant="ghost"
                       size="icon"
                       className="flex-shrink-0"
                       onClick={() => setExpandedId(expandedId === product.id ? null : product.id)}
