@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { Session } from "@supabase/supabase-js";
 import { ChatSidebar } from "@/components/ChatSidebar";
 import { ChatInterface } from "@/components/ChatInterface";
 import { ProductSuggestions } from "@/components/ProductSuggestions";
@@ -11,7 +9,8 @@ import { useChat } from "@/hooks/useChat";
 
 const Index = () => {
   const navigate = useNavigate();
-  const [session, setSession] = useState<Session | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const isMobile = useIsMobile();
   const [isChatOpen, setIsChatOpen] = useState(() => {
     // Start closed if viewport is too small for chat to fit inline
@@ -61,39 +60,30 @@ const Index = () => {
   };
 
   useEffect(() => {
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setSession(session);
+    // Check if user has access token
+    const checkAuth = () => {
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        setIsAuthenticated(true);
+        setIsCheckingAuth(false);
+        // Load chat history when user is authenticated
+        loadHistory();
+      } else {
+        setIsAuthenticated(false);
+        setIsCheckingAuth(false);
+        navigate("/auth");
       }
-    );
+    };
 
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
+    checkAuth();
+  }, [navigate, loadHistory]);
 
-    return () => subscription.unsubscribe();
-  }, []);
-
-
-  useEffect(() => {
-    if (session === null) {
-      // Wait a moment to see if we're loading the session
-      const timeout = setTimeout(() => {
-        if (!session) {
-          navigate("/auth");
-        }
-      }, 100);
-      return () => clearTimeout(timeout);
-    } else {
-      // Load chat history when user is authenticated
-      loadHistory();
-    }
-  }, [session, navigate, loadHistory]);
-
-  if (!session) {
+  if (isCheckingAuth) {
     return null; // Loading state
+  }
+
+  if (!isAuthenticated) {
+    return null; // Redirecting to auth
   }
 
   return (

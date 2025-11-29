@@ -589,7 +589,7 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen, products: externa
                     </div>
                   </div>
                   {expandedId !== product.id && (
-                    <div className="flex flex-col gap-2 flex-shrink-0">
+                    <div className="flex flex-col gap-2 flex-shrink-0 justify-center">
                       <div className="text-right space-y-0.5">
                         <div className="flex items-center justify-end gap-1.5">
                           {product.price > 0 ? (

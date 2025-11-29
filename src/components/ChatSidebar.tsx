@@ -90,10 +90,7 @@ export const ChatSidebar = ({
               <div className="flex h-full flex-col">
                 {/* Mobile Menu Header */}
                 <SheetHeader className="p-4">
-                  <SheetTitle className="flex items-center gap-2">
-                    partify
-                    <span className="text-xs font-normal text-muted-foreground">beta</span>
-                  </SheetTitle>
+                  <SheetTitle>partify</SheetTitle>
                 </SheetHeader>
 
                 {/* Chat History in Sheet */}
@@ -162,10 +159,7 @@ export const ChatSidebar = ({
             </SheetContent>
           </Sheet>
 
-          <div className="flex items-center gap-2">
-            <h2 className="text-lg font-semibold text-foreground">partify</h2>
-            <span className="text-xs text-muted-foreground">beta</span>
-          </div>
+          <h2 className="text-lg font-semibold text-foreground">partify</h2>
 
           <div className="flex gap-1">
             <Button
@@ -208,12 +202,7 @@ export const ChatSidebar = ({
     <div className={`flex h-screen flex-col bg-background transition-all duration-300 ease-in-out ${isCollapsed ? 'w-16' : 'w-64'}`}>
       {/* Header */}
       <div className={`flex items-center h-[72px] px-4 transition-all duration-300 ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
-        {!isCollapsed && (
-          <div className="flex items-center gap-2 transition-opacity duration-300">
-            <h2 className="text-lg font-semibold text-foreground">partify</h2>
-            <span className="text-xs text-muted-foreground">beta</span>
-          </div>
-        )}
+        {!isCollapsed && <h2 className="text-lg font-semibold text-foreground transition-opacity duration-300">partify</h2>}
         <div className={`flex gap-1 transition-all duration-300 ${isCollapsed ? 'flex-col' : ''}`}>
           <Button variant="ghost" size="icon" onClick={onToggle}>
             <Menu className="h-4 w-4" />

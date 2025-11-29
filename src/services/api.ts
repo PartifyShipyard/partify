@@ -38,7 +38,25 @@ apiClient.interceptors.request.use(
   }
 );
 
-// Response interceptor for error handling and logging
+// Token refresh state
+let isRefreshing = false;
+let failedQueue: Array<{
+  resolve: (value?: any) => void;
+  reject: (reason?: any) => void;
+}> = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
+// Response interceptor for error handling, logging, and token refresh
 apiClient.interceptors.response.use(
   (response) => {
     // Log successful response
@@ -54,15 +72,16 @@ apiClient.interceptors.response.use(
     }
     return response;
   },
-  (error: AxiosError) => {
+  async (error: AxiosError) => {
+    const originalRequest = error.config as any;
+
     // Log error response
     if (debugLogger) {
-      const config = error.config as any;
       debugLogger({
-        method: config?.method?.toUpperCase() || 'GET',
-        url: config?.url || '',
+        method: originalRequest?.method?.toUpperCase() || 'GET',
+        url: originalRequest?.url || '',
         status: error.response?.status,
-        requestData: config?._requestData,
+        requestData: originalRequest?._requestData,
         responseData: error.response?.data,
         error: {
           message: error.message,
@@ -71,7 +90,81 @@ apiClient.interceptors.response.use(
         },
       });
     }
-    // Let individual API calls handle errors and show appropriate messages
+
+    // Handle 401 Unauthorized errors with token refresh
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      // Don't try to refresh if this is the refresh endpoint itself
+      if (originalRequest.url?.includes('/auth/refresh')) {
+        console.log('Refresh token expired, clearing tokens');
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        window.location.href = '/auth';
+        return Promise.reject(error);
+      }
+
+      if (isRefreshing) {
+        // If already refreshing, queue this request
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return apiClient(originalRequest);
+          })
+          .catch((err) => {
+            return Promise.reject(err);
+          });
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      const refreshToken = localStorage.getItem('refresh_token');
+      
+      if (!refreshToken) {
+        console.log('No refresh token available');
+        localStorage.removeItem('access_token');
+        window.location.href = '/auth';
+        return Promise.reject(error);
+      }
+
+      try {
+        console.log('Attempting to refresh access token...');
+        const response = await apiClient.post('/auth/refresh', { refreshToken });
+        
+        const { accessToken, refreshToken: newRefreshToken } = response.data;
+        
+        // Update tokens
+        localStorage.setItem('access_token', accessToken);
+        localStorage.setItem('refresh_token', newRefreshToken);
+        
+        console.log('Token refreshed successfully');
+        
+        // Update authorization header
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        
+        // Process queued requests
+        processQueue(null, accessToken);
+        
+        isRefreshing = false;
+        
+        // Retry original request
+        return apiClient(originalRequest);
+      } catch (refreshError) {
+        console.error('Token refresh failed:', refreshError);
+        processQueue(refreshError, null);
+        isRefreshing = false;
+        
+        // Clear tokens and redirect to login
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        window.location.href = '/auth';
+        
+        return Promise.reject(refreshError);
+      }
+    }
+
+    // For all other errors, reject normally
     return Promise.reject(error);
   }
 );

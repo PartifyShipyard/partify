@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,46 +35,25 @@ const Auth = () => {
         password: loginPassword,
       });
 
-      const { error } = await supabase.auth.signInWithPassword({
-        email: validated.email,
-        password: validated.password,
-      });
-
-      if (error) {
-        if (error.message.includes("Invalid login credentials")) {
-          toast({
-            title: "Login failed",
-            description: "Invalid email or password. Please try again.",
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Error",
-            description: error.message,
-            variant: "destructive",
-          });
-        }
-        return;
-      }
-
-      // Also authenticate with the API
-      try {
-        await apiService.auth.login(validated.email, validated.password);
-      } catch (apiError: any) {
-        console.warn("API authentication failed:", apiError);
-        // Continue anyway - Supabase auth succeeded
-      }
+      // Authenticate with the API
+      await apiService.auth.login(validated.email, validated.password);
 
       toast({
         title: "Welcome back!",
         description: "You've successfully logged in.",
       });
       navigate("/");
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof z.ZodError) {
         toast({
           title: "Validation error",
           description: error.errors[0].message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Login failed",
+          description: error.response?.data?.message || error.response?.data?.detail || "Invalid email or password. Please try again.",
           variant: "destructive",
         });
       }
@@ -95,21 +73,24 @@ const Auth = () => {
         fullName: signupFullName,
       });
 
-      const redirectUrl = `${window.location.origin}/`;
+      // Register with the API
+      await apiService.auth.register(validated.email, validated.password, validated.fullName);
 
-      const { error } = await supabase.auth.signUp({
-        email: validated.email,
-        password: validated.password,
-        options: {
-          emailRedirectTo: redirectUrl,
-          data: {
-            full_name: validated.fullName,
-          },
-        },
+      toast({
+        title: "Account created!",
+        description: "Welcome! You're now logged in.",
       });
-
-      if (error) {
-        if (error.message.includes("already registered")) {
+      navigate("/");
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation error",
+          description: error.errors[0].message,
+          variant: "destructive",
+        });
+      } else {
+        const errorMessage = error.response?.data?.message || error.response?.data?.detail;
+        if (errorMessage && errorMessage.includes("already")) {
           toast({
             title: "Account exists",
             description: "An account with this email already exists. Please login instead.",
@@ -117,34 +98,11 @@ const Auth = () => {
           });
         } else {
           toast({
-            title: "Error",
-            description: error.message,
+            title: "Registration failed",
+            description: errorMessage || "Failed to create account. Please try again.",
             variant: "destructive",
           });
         }
-        return;
-      }
-
-      // Also register with the API
-      try {
-        await apiService.auth.register(validated.email, validated.password, validated.fullName);
-      } catch (apiError: any) {
-        console.warn("API registration failed:", apiError);
-        // Continue anyway - Supabase signup succeeded
-      }
-
-      toast({
-        title: "Account created!",
-        description: "Welcome! You're now logged in.",
-      });
-      navigate("/");
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        toast({
-          title: "Validation error",
-          description: error.errors[0].message,
-          variant: "destructive",
-        });
       }
     } finally {
       setIsLoading(false);
@@ -154,7 +112,22 @@ const Auth = () => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="flex flex-col items-center gap-8">
-        <h1 className="text-5xl font-bold text-primary">partify</h1>
+        <div className="flex items-center gap-3">
+          <div 
+            className="h-12 w-12 bg-primary"
+            style={{
+              maskImage: 'url(/logo.png)',
+              maskSize: 'contain',
+              maskRepeat: 'no-repeat',
+              maskPosition: 'center',
+              WebkitMaskImage: 'url(/logo.png)',
+              WebkitMaskSize: 'contain',
+              WebkitMaskRepeat: 'no-repeat',
+              WebkitMaskPosition: 'center',
+            }}
+          />
+          <h1 className="text-5xl font-bold text-primary">partify</h1>
+        </div>
         <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Welcome</CardTitle>

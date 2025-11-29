@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,41 +18,20 @@ interface UserProfileDropdownProps {
 
 export const UserProfileDropdown = ({ showName = false }: UserProfileDropdownProps) => {
   const navigate = useNavigate();
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [userName, setUserName] = useState<string>("");
-
-  useEffect(() => {
-    loadUserProfile();
-  }, []);
-
-  const loadUserProfile = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("avatar_url, full_name")
-      .eq("id", user.id)
-      .single();
-
-    if (profile) {
-      setAvatarUrl(profile.avatar_url);
-      setUserName(profile.full_name || user.email?.split("@")[0] || "User");
-    } else {
-      setUserName(user.email?.split("@")[0] || "User");
-    }
-  };
+  const [avatarUrl] = useState<string | null>(null);
+  const [userName] = useState<string>("User");
 
   const handleLogout = async () => {
-    // Logout from API first (clears token)
+    // Logout from API (clears token)
     try {
       await apiService.auth.logout();
     } catch (error) {
       console.warn("API logout failed:", error);
     }
     
-    // Logout from Supabase
-    await supabase.auth.signOut();
+    // Clear local tokens
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
     
     // Navigate to auth page
     navigate("/auth");
