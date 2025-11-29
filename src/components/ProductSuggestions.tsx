@@ -141,7 +141,7 @@ export const ProductSuggestions = () => {
                     <Collapsible defaultOpen>
                       <CollapsibleTrigger asChild>
                         <Button variant="ghost" size="sm" className="w-full justify-between">
-                          <span className="text-sm font-medium">Filter by Model</span>
+                          <span className="text-sm font-medium">Model</span>
                           <ChevronDown className="h-4 w-4 transition-transform duration-200 data-[state=open]:rotate-180" />
                         </Button>
                       </CollapsibleTrigger>
@@ -167,7 +167,7 @@ export const ProductSuggestions = () => {
                     <Collapsible defaultOpen>
                       <CollapsibleTrigger asChild>
                         <Button variant="ghost" size="sm" className="w-full justify-between">
-                          <span className="text-sm font-medium">Filter by Producer</span>
+                          <span className="text-sm font-medium">Producer</span>
                           <ChevronDown className="h-4 w-4 transition-transform duration-200 data-[state=open]:rotate-180" />
                         </Button>
                       </CollapsibleTrigger>
