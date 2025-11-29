@@ -99,7 +99,7 @@ export const ProductSuggestions = () => {
             <Card key={product.id} className="overflow-hidden">
               <CardHeader className="p-4">
                 <div className="flex items-start justify-between gap-3">
-                  <div className="flex gap-3 flex-1 min-w-0">
+                  <div className="flex gap-3 flex-1 min-w-0 items-center">
                     {expandedId !== product.id && (
                       <img
                         src={product.image}
