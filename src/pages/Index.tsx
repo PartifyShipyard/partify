@@ -5,8 +5,6 @@ import { Session } from "@supabase/supabase-js";
 import { ChatSidebar } from "@/components/ChatSidebar";
 import { ChatInterface } from "@/components/ChatInterface";
 import { ProductSuggestions } from "@/components/ProductSuggestions";
-import { Button } from "@/components/ui/button";
-import { Settings } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -56,14 +54,6 @@ const Index = () => {
         <ProductSuggestions />
         <ChatInterface isOpen={isChatOpen} onToggle={() => setIsChatOpen(!isChatOpen)} />
       </div>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute top-4 right-4 z-50"
-        onClick={() => navigate("/settings")}
-      >
-        <Settings className="h-5 w-5" />
-      </Button>
     </div>
   );
 };
