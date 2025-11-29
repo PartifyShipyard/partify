@@ -26,9 +26,9 @@ export const ChatSidebar = ({ isCollapsed, onToggle }: ChatSidebarProps) => {
   const { theme, setTheme } = useTheme();
 
   return (
-    <div className={`flex h-full min-h-0 flex-col flex-shrink-0 border-r border-border bg-card transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'}`}>
+    <div className={`flex h-screen flex-col border-r border-border bg-card transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'}`}>
       {/* Header */}
-      <div className={`flex items-center h-[72px] flex-shrink-0 px-4 border-b border-border ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
+      <div className={`flex items-center h-[72px] px-4 border-b border-border ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
         {!isCollapsed && <h2 className="text-lg font-semibold text-foreground">Partify</h2>}
         <div className={`flex gap-1 ${isCollapsed ? 'flex-col' : ''}`}>
           <Button variant="ghost" size="icon" onClick={onToggle}>
@@ -83,7 +83,7 @@ export const ChatSidebar = ({ isCollapsed, onToggle }: ChatSidebarProps) => {
       </ScrollArea>
 
       {/* Account Section */}
-      <div className="p-3 border-t border-border flex-shrink-0">
+      <div className="p-3 border-t border-border">
         {!isCollapsed ? (
           <div className="flex items-center gap-3 rounded-lg p-2 hover:bg-accent">
             <Avatar className="h-8 w-8">
