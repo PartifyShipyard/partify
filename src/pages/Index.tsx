@@ -5,7 +5,9 @@ import { Session } from "@supabase/supabase-js";
 import { ChatSidebar } from "@/components/ChatSidebar";
 import { ChatInterface } from "@/components/ChatInterface";
 import { ProductSuggestions } from "@/components/ProductSuggestions";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useChat } from "@/hooks/useChat";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -20,6 +22,43 @@ const Index = () => {
     return window.innerWidth >= totalNeeded;
   });
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+  // Chat hook for managing conversations
+  const {
+    messages,
+    history,
+    isLoading: isChatLoading,
+    suggestedProducts,
+    sendMessage,
+    loadHistory,
+    loadConversation,
+    deleteConversation,
+    createConversation,
+    startNewConversation,
+  } = useChat();
+
+  const handleNewChat = async () => {
+    // Create a new conversation via API
+    console.log('Starting new conversation...');
+    startNewConversation();
+    setIsChatOpen(true); // Open chat when starting new conversation
+  };
+
+  const handleSelectChat = async (conversationId: number) => {
+    // Load the selected conversation
+    console.log('Index: Loading conversation:', conversationId);
+    try {
+      const result = await loadConversation(conversationId);
+      console.log('Index: Conversation loaded, suggestedProducts:', suggestedProducts);
+      // Only open chat if conversation loaded successfully
+      if (result) {
+        setIsChatOpen(true);
+      }
+    } catch (error) {
+      console.error('Failed to load conversation:', error);
+      // Error is already shown via toast in loadConversation
+    }
+  };
 
   useEffect(() => {
     // Set up auth state listener
@@ -47,8 +86,11 @@ const Index = () => {
         }
       }, 100);
       return () => clearTimeout(timeout);
+    } else {
+      // Load chat history when user is authenticated
+      loadHistory();
     }
-  }, [session, navigate]);
+  }, [session, navigate, loadHistory]);
 
   if (!session) {
     return null; // Loading state
@@ -60,10 +102,28 @@ const Index = () => {
         <ChatSidebar
           isCollapsed={isSidebarCollapsed}
           onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+          onNewChat={handleNewChat}
+          history={history}
+          onSelectChat={handleSelectChat}
+          onDeleteChat={deleteConversation}
         />
         <div className={`flex flex-1 min-h-0 ${isMobile ? 'flex-col' : ''}`}>
-          <ProductSuggestions onChatToggle={() => setIsChatOpen(!isChatOpen)} isChatOpen={isChatOpen} />
-          <ChatInterface isOpen={isChatOpen} onToggle={() => setIsChatOpen(!isChatOpen)} />
+          <ErrorBoundary>
+            <ProductSuggestions 
+              onChatToggle={() => setIsChatOpen(!isChatOpen)} 
+              isChatOpen={isChatOpen}
+              products={suggestedProducts}
+            />
+          </ErrorBoundary>
+          <ErrorBoundary>
+            <ChatInterface 
+              isOpen={isChatOpen} 
+              onToggle={() => setIsChatOpen(!isChatOpen)}
+              messages={messages}
+              isLoading={isChatLoading}
+              onSendMessage={sendMessage}
+            />
+          </ErrorBoundary>
         </div>
       </div>
     </div>

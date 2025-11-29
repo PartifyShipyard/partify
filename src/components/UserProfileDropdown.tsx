@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Settings, LogOut, User } from "lucide-react";
+import { apiService } from "@/services/api";
 
 interface UserProfileDropdownProps {
   showName?: boolean;
@@ -44,7 +45,17 @@ export const UserProfileDropdown = ({ showName = false }: UserProfileDropdownPro
   };
 
   const handleLogout = async () => {
+    // Logout from API first (clears token)
+    try {
+      await apiService.auth.logout();
+    } catch (error) {
+      console.warn("API logout failed:", error);
+    }
+    
+    // Logout from Supabase
     await supabase.auth.signOut();
+    
+    // Navigate to auth page
     navigate("/auth");
   };
 
@@ -79,23 +90,14 @@ export const UserProfileDropdown = ({ showName = false }: UserProfileDropdownPro
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 bg-card z-50" align="end" forceMount>
-        <div className="flex items-center justify-start gap-2 p-2">
-          <Avatar className="h-8 w-8">
-            <AvatarImage src={avatarUrl || undefined} alt={userName} />
-            <AvatarFallback className="bg-primary text-primary-foreground text-xs">
-              {getInitials()}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{userName}</p>
-          </div>
-        </div>
-        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => navigate("/settings")} className="cursor-pointer">
+          <User className="mr-2 h-4 w-4" />
+          <span>Profile</span>
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/settings")} className="cursor-pointer">
           <Settings className="mr-2 h-4 w-4" />
           <span>Settings</span>
         </DropdownMenuItem>
-        <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-destructive">
           <LogOut className="mr-2 h-4 w-4" />
           <span>Logout</span>

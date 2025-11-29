@@ -1,4 +1,4 @@
-import { History, Plus, User, Settings, Moon, Sun, Menu, X, Trash2 } from "lucide-react";
+import { History, Plus, User, Settings, Moon, Sun, Menu, X, Trash2, Bug } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -23,39 +23,56 @@ import { useTheme } from "next-themes";
 import { useState } from "react";
 import { UserProfileDropdown } from "./UserProfileDropdown";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useDebug } from "@/contexts/DebugContext";
+import { Toggle } from "@/components/ui/toggle";
 
 interface ChatHistory {
-  id: string;
+  id: number;
+  userId: number;
   title: string;
-  date: string;
+  lastMessageAt: string;
+  createdAt: string;
+  messageCount: number;
 }
-
-const initialHistory: ChatHistory[] = [
-  { id: "1", title: "Brake pad search", date: "Today" },
-  { id: "2", title: "Engine oil filter", date: "Today" },
-  { id: "3", title: "Timing belt kit", date: "Yesterday" },
-  { id: "4", title: "Suspension parts", date: "2 days ago" },
-];
 
 interface ChatSidebarProps {
   isCollapsed: boolean;
   onToggle: () => void;
+  onNewChat?: () => void;
+  history?: ChatHistory[];
+  onSelectChat?: (conversationId: number) => void;
+  onDeleteChat?: (conversationId: number) => void;
 }
 
-export const ChatSidebar = ({ isCollapsed, onToggle }: ChatSidebarProps) => {
+export const ChatSidebar = ({ 
+  isCollapsed, 
+  onToggle, 
+  onNewChat,
+  history = [],
+  onSelectChat,
+  onDeleteChat,
+}: ChatSidebarProps) => {
   const { theme, setTheme } = useTheme();
-  const [history, setHistory] = useState<ChatHistory[]>(initialHistory);
+  const { debugMode, toggleDebugMode } = useDebug();
   const [showClearDialog, setShowClearDialog] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const isMobile = useIsMobile();
 
   const clearAllHistory = () => {
-    setHistory([]);
+    // Clear all conversations - not implemented in API
     setShowClearDialog(false);
   };
 
-  const deleteHistoryItem = (id: string) => {
-    setHistory((prev) => prev.filter((item) => item.id !== id));
+  const deleteHistoryItem = (id: number) => {
+    if (onDeleteChat) {
+      onDeleteChat(id);
+    }
+  };
+
+  const handleChatClick = (id: number) => {
+    if (onSelectChat) {
+      onSelectChat(id);
+    }
   };
 
   // Mobile Top Bar Navigation
@@ -72,50 +89,62 @@ export const ChatSidebar = ({ isCollapsed, onToggle }: ChatSidebarProps) => {
             <SheetContent side="left" className="w-full p-0">
               <div className="flex h-full flex-col">
                 {/* Mobile Menu Header */}
-                <SheetHeader className="border-b border-border p-4">
-                  <SheetTitle>partify</SheetTitle>
+                <SheetHeader className="p-4">
+                  <SheetTitle className="flex items-center gap-2">
+                    partify
+                    <span className="text-xs font-normal text-muted-foreground">beta</span>
+                  </SheetTitle>
                 </SheetHeader>
 
                 {/* Chat History in Sheet */}
                 <ScrollArea className="flex-1 px-3">
                   <div className="space-y-1 py-4">
+                    {/* Debug Mode Toggle */}
+                    <div className="mb-3 px-3">
+                      <Toggle
+                        pressed={debugMode}
+                        onPressedChange={toggleDebugMode}
+                        size="sm"
+                        className="w-full justify-start gap-2"
+                        aria-label="Toggle debug mode"
+                      >
+                        <Bug className="h-4 w-4" />
+                        <span className="text-xs">Debug Mode</span>
+                      </Toggle>
+                    </div>
+                    
                     <div className="mb-2 flex items-center justify-between px-3">
                       <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                         <History className="h-4 w-4" />
-                        <span>Recent Searches</span>
+                        <span>Recent Chats</span>
                       </div>
-                      {history.length > 0 && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6"
-                          onClick={() => setShowClearDialog(true)}
-                          title="Clear all history"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
-                      )}
                     </div>
                     {history.length === 0 ? (
                       <div className="px-3 py-8 text-center text-sm text-muted-foreground">
-                        No search history
+                        No chat history
                       </div>
                     ) : (
                       history.map((chat) => (
                         <div
                           key={chat.id}
-                          className="group relative w-full rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-accent"
+                          className="group relative w-full rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-accent cursor-pointer"
+                          onClick={() => handleChatClick(chat.id)}
                         >
                           <div className="pr-8">
                             <div className="font-medium text-foreground">{chat.title}</div>
-                            <div className="text-xs text-muted-foreground">{chat.date}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {chat.messageCount} messages • {new Date(chat.lastMessageAt).toLocaleDateString()}
+                            </div>
                           </div>
                           <Button
                             variant="ghost"
                             size="icon"
                             className="absolute right-2 top-1/2 h-6 w-6 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100"
-                            onClick={() => deleteHistoryItem(chat.id)}
-                            title="Delete search"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteHistoryItem(chat.id);
+                            }}
+                            title="Delete conversation"
                           >
                             <X className="h-3 w-3" />
                           </Button>
@@ -133,7 +162,10 @@ export const ChatSidebar = ({ isCollapsed, onToggle }: ChatSidebarProps) => {
             </SheetContent>
           </Sheet>
 
-          <h2 className="text-lg font-semibold text-foreground">partify</h2>
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-foreground">partify</h2>
+            <span className="text-xs text-muted-foreground">beta</span>
+          </div>
 
           <div className="flex gap-1">
             <Button
@@ -147,7 +179,7 @@ export const ChatSidebar = ({ isCollapsed, onToggle }: ChatSidebarProps) => {
                 <Moon className="h-4 w-4" />
               )}
             </Button>
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" onClick={onNewChat}>
               <Plus className="h-4 w-4" />
             </Button>
           </div>
@@ -176,7 +208,12 @@ export const ChatSidebar = ({ isCollapsed, onToggle }: ChatSidebarProps) => {
     <div className={`flex h-screen flex-col bg-background transition-all duration-300 ease-in-out ${isCollapsed ? 'w-16' : 'w-64'}`}>
       {/* Header */}
       <div className={`flex items-center h-[72px] px-4 transition-all duration-300 ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
-        {!isCollapsed && <h2 className="text-lg font-semibold text-foreground transition-opacity duration-300">partify</h2>}
+        {!isCollapsed && (
+          <div className="flex items-center gap-2 transition-opacity duration-300">
+            <h2 className="text-lg font-semibold text-foreground">partify</h2>
+            <span className="text-xs text-muted-foreground">beta</span>
+          </div>
+        )}
         <div className={`flex gap-1 transition-all duration-300 ${isCollapsed ? 'flex-col' : ''}`}>
           <Button variant="ghost" size="icon" onClick={onToggle}>
             <Menu className="h-4 w-4" />
@@ -195,7 +232,7 @@ export const ChatSidebar = ({ isCollapsed, onToggle }: ChatSidebarProps) => {
                   <Moon className="h-4 w-4" />
                 )}
               </Button>
-              <Button variant="ghost" size="icon" className="transition-opacity duration-300">
+              <Button variant="ghost" size="icon" className="transition-opacity duration-300" onClick={onNewChat}>
                 <Plus className="h-4 w-4" />
               </Button>
             </>
@@ -207,43 +244,52 @@ export const ChatSidebar = ({ isCollapsed, onToggle }: ChatSidebarProps) => {
       <ScrollArea className="flex-1 px-3 transition-all duration-300">
         {!isCollapsed ? (
           <div className="space-y-1 py-4 transition-opacity duration-300">
+            {/* Debug Mode Toggle */}
+            <div className="mb-3 px-3">
+              <Toggle
+                pressed={debugMode}
+                onPressedChange={toggleDebugMode}
+                size="sm"
+                className="w-full justify-start gap-2"
+                aria-label="Toggle debug mode"
+              >
+                <Bug className="h-4 w-4" />
+                <span className="text-xs">Debug Mode</span>
+              </Toggle>
+            </div>
+            
             <div className="mb-2 flex items-center justify-between px-3">
               <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                 <History className="h-4 w-4" />
-                <span>Recent Searches</span>
+                <span>Recent Chats</span>
               </div>
-              {history.length > 0 && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-6 w-6"
-                  onClick={() => setShowClearDialog(true)}
-                  title="Clear all history"
-                >
-                  <Trash2 className="h-3 w-3" />
-                </Button>
-              )}
             </div>
             {history.length === 0 ? (
               <div className="px-3 py-8 text-center text-sm text-muted-foreground">
-                No search history
+                No chat history
               </div>
             ) : (
               history.map((chat) => (
                 <div
                   key={chat.id}
-                  className="group relative w-full rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-accent"
+                  className="group relative w-full rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-accent cursor-pointer"
+                  onClick={() => handleChatClick(chat.id)}
                 >
                   <div className="pr-8">
                     <div className="font-medium text-foreground">{chat.title}</div>
-                    <div className="text-xs text-muted-foreground">{chat.date}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {chat.messageCount} messages • {new Date(chat.lastMessageAt).toLocaleDateString()}
+                    </div>
                   </div>
                   <Button
                     variant="ghost"
                     size="icon"
                     className="absolute right-2 top-1/2 h-6 w-6 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100"
-                    onClick={() => deleteHistoryItem(chat.id)}
-                    title="Delete search"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteHistoryItem(chat.id);
+                    }}
+                    title="Delete conversation"
                   >
                     <X className="h-3 w-3" />
                   </Button>

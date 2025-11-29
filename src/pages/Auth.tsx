@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
+import { apiService } from "@/services/api";
 
 const authSchema = z.object({
   email: z.string().trim().email("Invalid email address").max(255, "Email must be less than 255 characters"),
@@ -55,6 +56,14 @@ const Auth = () => {
           });
         }
         return;
+      }
+
+      // Also authenticate with the API
+      try {
+        await apiService.auth.login(validated.email, validated.password);
+      } catch (apiError: any) {
+        console.warn("API authentication failed:", apiError);
+        // Continue anyway - Supabase auth succeeded
       }
 
       toast({
@@ -114,6 +123,14 @@ const Auth = () => {
           });
         }
         return;
+      }
+
+      // Also register with the API
+      try {
+        await apiService.auth.register(validated.email, validated.password, validated.fullName);
+      } catch (apiError: any) {
+        console.warn("API registration failed:", apiError);
+        // Continue anyway - Supabase signup succeeded
       }
 
       toast({

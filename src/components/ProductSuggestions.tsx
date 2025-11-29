@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronDown, ChevronUp, ExternalLink, ShoppingCart, X, Filter, CheckCircle, ArrowUpDown, Plus, Maximize2, MessageSquare } from "lucide-react";
+import { useProducts } from "@/hooks/useProducts";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,7 +22,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 
 interface Product {
-  id: string;
+  id: number;
   name: string;
   partNumber: string;
   brand: string;
@@ -29,25 +30,28 @@ interface Product {
   shippingCost: number;
   estimatedShipping: string;
   validatedByManufacturer: boolean;
-  availability: "in-stock" | "limited" | "out-of-stock";
-  image: string;
+  availability: string;
+  purchasingUrl?: string;
+  image?: string;
   images: string[];
   description: string;
   compatibleModels: string[];
   shippingCountry: string;
   stock: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 const productFormSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100, "Name must be less than 100 characters"),
   partNumber: z.string().trim().min(1, "Part number is required").max(50, "Part number must be less than 50 characters"),
   brand: z.string().trim().min(1, "Brand is required").max(50, "Brand must be less than 50 characters"),
-  price: z.coerce.number().positive("Price must be positive").max(999999, "Price is too high"),
-  shippingCost: z.coerce.number().positive("Shipping cost must be positive").max(9999, "Shipping cost is too high"),
+  price: z.coerce.number().min(0, "Price must be 0 or positive").max(999999, "Price is too high"),
+  shippingCost: z.coerce.number().min(0, "Shipping cost must be 0 or positive").max(9999, "Shipping cost is too high"),
   estimatedShipping: z.string().trim().min(1, "Estimated shipping is required").max(50, "Estimated shipping must be less than 50 characters"),
   validatedByManufacturer: z.boolean(),
-  availability: z.enum(["in-stock", "limited", "out-of-stock"]),
-  image: z.string().trim().url("Must be a valid URL"),
+  purchasingUrl: z.string().trim().url("Must be a valid URL").min(1, "Purchasing URL is required"),
+  image: z.string().trim().url("Must be a valid URL").optional().or(z.literal("")),
   description: z.string().trim().min(1, "Description is required").max(500, "Description must be less than 500 characters"),
   compatibleModels: z.string().trim().min(1, "Compatible models are required").max(500, "Compatible models must be less than 500 characters"),
   shippingCountry: z.string().trim().min(1, "Shipping country is required").max(50, "Shipping country must be less than 50 characters"),
@@ -56,218 +60,16 @@ const productFormSchema = z.object({
 
 type ProductFormValues = z.infer<typeof productFormSchema>;
 
-const mockProducts: Product[] = [
-  {
-    id: "1",
-    name: "iPhone 14 Pro OLED Display",
-    partNumber: "LCD-IP14P-OL",
-    brand: "iFixit",
-    price: 279.99,
-    shippingCost: 8.99,
-    estimatedShipping: "2-3 business days",
-    validatedByManufacturer: true,
-    availability: "in-stock",
-    image: "https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=400",
-    images: [
-      "https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=400",
-      "https://images.unsplash.com/photo-1592286927505-2fd0945e0fef?w=400",
-      "https://images.unsplash.com/photo-1611472173362-3f53dbd65d80?w=400"
-    ],
-    description: "Original quality OLED replacement display with digitizer assembly",
-    compatibleModels: ["iPhone 14 Pro", "iPhone 14 Pro Max"],
-    shippingCountry: "USA",
-    stock: 45,
-  },
-  {
-    id: "2",
-    name: "Samsung Galaxy S23 Battery",
-    partNumber: "BAT-S23-3900",
-    brand: "Samsung",
-    price: 34.99,
-    shippingCost: 4.99,
-    estimatedShipping: "3-5 business days",
-    validatedByManufacturer: false,
-    availability: "in-stock",
-    image: "https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=400",
-    images: [
-      "https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=400",
-      "https://images.unsplash.com/photo-1585790050230-5dd28404f8db?w=400"
-    ],
-    description: "3900mAh replacement battery with installation tools",
-    compatibleModels: ["Samsung Galaxy S23", "Samsung Galaxy S23+"],
-    shippingCountry: "South Korea",
-    stock: 128,
-  },
-  {
-    id: "3",
-    name: "MacBook Pro Battery Replacement Kit",
-    partNumber: "BAT-MBP16-M1",
-    brand: "iFixit",
-    price: 159.99,
-    shippingCost: 7.99,
-    estimatedShipping: "1-2 business days",
-    validatedByManufacturer: true,
-    availability: "limited",
-    image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400",
-    images: [
-      "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400",
-      "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400",
-      "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=400"
-    ],
-    description: "OEM quality battery with all necessary tools and adhesive strips",
-    compatibleModels: ["MacBook Pro 16-inch M1 2021", "MacBook Pro 16-inch M2 2023"],
-    shippingCountry: "USA",
-    stock: 12,
-  },
-  {
-    id: "4",
-    name: "USB-C Charging Port Flex Cable",
-    partNumber: "FLX-USBC-UNIV",
-    brand: "RepairTech",
-    price: 19.99,
-    shippingCost: 3.99,
-    estimatedShipping: "2-4 business days",
-    validatedByManufacturer: true,
-    availability: "in-stock",
-    image: "https://images.unsplash.com/photo-1591290619762-c588e5b76c19?w=400",
-    images: [
-      "https://images.unsplash.com/photo-1591290619762-c588e5b76c19?w=400",
-      "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=400"
-    ],
-    description: "Replacement charging port flex cable assembly for USB-C devices",
-    compatibleModels: ["Samsung Galaxy S21-S24", "Google Pixel 6-8", "OnePlus 9-11"],
-    shippingCountry: "China",
-    stock: 234,
-  },
-  {
-    id: "5",
-    name: "iPad Pro Rear Camera Module",
-    partNumber: "CAM-IPP-12MP",
-    brand: "iFixit",
-    price: 89.99,
-    shippingCost: 5.99,
-    estimatedShipping: "1-2 business days",
-    validatedByManufacturer: true,
-    availability: "in-stock",
-    image: "https://images.unsplash.com/photo-1585790050230-5dd28404f8db?w=400",
-    images: [
-      "https://images.unsplash.com/photo-1585790050230-5dd28404f8db?w=400",
-      "https://images.unsplash.com/photo-1611472173362-3f53dbd65d80?w=400"
-    ],
-    description: "12MP rear camera replacement module with flex cable",
-    compatibleModels: ["iPad Pro 11-inch 2020-2022", "iPad Pro 12.9-inch 2020-2022"],
-    shippingCountry: "USA",
-    stock: 67,
-  },
-  {
-    id: "6",
-    name: "Laptop Speaker Replacement",
-    partNumber: "SPK-LT-UNIV",
-    brand: "RepairTech",
-    price: 24.99,
-    shippingCost: 4.99,
-    estimatedShipping: "3-5 business days",
-    validatedByManufacturer: false,
-    availability: "in-stock",
-    image: "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=400",
-    images: [
-      "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=400",
-      "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400"
-    ],
-    description: "Universal laptop speaker set with connection cables",
-    compatibleModels: ["HP Pavilion 15", "Dell Inspiron 15", "Lenovo IdeaPad"],
-    shippingCountry: "China",
-    stock: 189,
-  },
-  {
-    id: "7",
-    name: "Phone Opening Tool Kit",
-    partNumber: "TOOL-OPEN-PRO",
-    brand: "iFixit",
-    price: 29.99,
-    shippingCost: 3.99,
-    estimatedShipping: "2-3 business days",
-    validatedByManufacturer: true,
-    availability: "in-stock",
-    image: "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?w=400",
-    images: [
-      "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?w=400",
-      "https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=400"
-    ],
-    description: "Professional phone repair toolkit with precision screwdrivers and pry tools",
-    compatibleModels: ["iPhone All Models", "Samsung Galaxy All Models", "Google Pixel All Models"],
-    shippingCountry: "USA",
-    stock: 312,
-  },
-  {
-    id: "8",
-    name: "Adhesive Strips & Seals Kit",
-    partNumber: "ADH-SEAL-KIT",
-    brand: "iFixit",
-    price: 12.99,
-    shippingCost: 2.99,
-    estimatedShipping: "1-2 business days",
-    validatedByManufacturer: true,
-    availability: "limited",
-    image: "https://images.unsplash.com/photo-1585366119957-e9730b6d0f60?w=400",
-    images: [
-      "https://images.unsplash.com/photo-1585366119957-e9730b6d0f60?w=400"
-    ],
-    description: "Pre-cut adhesive strips for display and battery replacements",
-    compatibleModels: ["iPhone 12-15", "Samsung Galaxy S20-S24", "Google Pixel 6-8"],
-    shippingCountry: "USA",
-    stock: 8,
-  },
-  {
-    id: "9",
-    name: "Nintendo Switch Joy-Con Buttons",
-    partNumber: "BTN-NSW-JC",
-    brand: "RepairTech",
-    price: 16.99,
-    shippingCost: 3.99,
-    estimatedShipping: "3-5 business days",
-    validatedByManufacturer: false,
-    availability: "in-stock",
-    image: "https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?w=400",
-    images: [
-      "https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?w=400",
-      "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=400"
-    ],
-    description: "Complete button set for Joy-Con controller repair",
-    compatibleModels: ["Nintendo Switch Original", "Nintendo Switch OLED"],
-    shippingCountry: "Japan",
-    stock: 156,
-  },
-  {
-    id: "10",
-    name: "Laptop Keyboard Replacement",
-    partNumber: "KBD-LT-US",
-    brand: "RepairTech",
-    price: 44.99,
-    shippingCost: 5.99,
-    estimatedShipping: "2-3 business days",
-    validatedByManufacturer: true,
-    availability: "in-stock",
-    image: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400",
-    images: [
-      "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400",
-      "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400"
-    ],
-    description: "US layout laptop keyboard with backlight support",
-    compatibleModels: ["HP ProBook 450", "Dell Latitude 5420", "Lenovo ThinkPad E15"],
-    shippingCountry: "China",
-    stock: 94,
-  },
-];
-
 interface ProductSuggestionsProps {
   onChatToggle?: () => void;
   isChatOpen?: boolean;
+  products?: Product[];
 }
 
-export const ProductSuggestions = ({ onChatToggle, isChatOpen }: ProductSuggestionsProps = {}) => {
+export const ProductSuggestions = ({ onChatToggle, isChatOpen, products: externalProducts }: ProductSuggestionsProps = {}) => {
   const { toast } = useToast();
-  const [products, setProducts] = useState<Product[]>(mockProducts);
+  const { products: apiProducts, isLoading: isProductLoading, createProduct } = useProducts();
+  const [products, setProducts] = useState<Product[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [selectedModels, setSelectedModels] = useState<string[]>([]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
@@ -286,7 +88,7 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen }: ProductSuggesti
       shippingCost: 0,
       estimatedShipping: "",
       validatedByManufacturer: false,
-      availability: "in-stock",
+      purchasingUrl: "",
       image: "",
       description: "",
       compatibleModels: "",
@@ -345,9 +147,34 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen }: ProductSuggesti
     setSelectedBrands([]);
   };
 
-  const onSubmit = (data: ProductFormValues) => {
-    const newProduct: Product = {
-      id: Date.now().toString(),
+  // Sync API products and external products (from chat) with local state
+  useEffect(() => {
+    console.log('ProductSuggestions: Syncing products', {
+      apiProductsCount: apiProducts.length,
+      externalProductsCount: externalProducts?.length || 0
+    });
+    
+    // Merge API products and external products (from chat suggestions)
+    const mergedProducts = [...apiProducts];
+    
+    if (externalProducts && externalProducts.length > 0) {
+      // Add external products that aren't already in the list
+      externalProducts.forEach((extProduct) => {
+        if (!mergedProducts.find((p) => p.id === extProduct.id)) {
+          mergedProducts.push(extProduct);
+        }
+      });
+    }
+    
+    console.log('ProductSuggestions: Merged products count:', mergedProducts.length);
+    
+    // Always update products (even if empty, to clear when switching conversations)
+    setProducts(mergedProducts);
+  }, [apiProducts, externalProducts]);
+
+  const onSubmit = async (data: ProductFormValues) => {
+    const imageUrl = data.image || '/placeholder.svg';
+    const productData = {
       name: data.name,
       partNumber: data.partNumber,
       brand: data.brand,
@@ -355,22 +182,24 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen }: ProductSuggesti
       shippingCost: data.shippingCost,
       estimatedShipping: data.estimatedShipping,
       validatedByManufacturer: data.validatedByManufacturer,
-      availability: data.availability,
-      image: data.image,
-      images: [data.image],
+      availability: "in-stock" as const,
+      purchasingUrl: data.purchasingUrl,
+      image: imageUrl,
+      images: [imageUrl],
       description: data.description,
       compatibleModels: data.compatibleModels.split(',').map(m => m.trim()),
       shippingCountry: data.shippingCountry,
       stock: data.stock,
     };
     
-    setProducts([newProduct, ...products]);
-    setDialogOpen(false);
-    form.reset();
-    toast({
-      title: "Product added",
-      description: "The new product has been added successfully.",
-    });
+    // Send to API
+    const result = await createProduct(productData);
+    
+    if (result) {
+      setDialogOpen(false);
+      form.reset();
+      // Product will be added to list via useEffect when apiProducts updates
+    }
   };
 
   const getAvailabilityColor = (availability: Product["availability"]) => {
@@ -454,7 +283,6 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen }: ProductSuggesti
                       />
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-4">
                       <FormField
                         control={form.control}
                         name="brand"
@@ -468,29 +296,20 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen }: ProductSuggesti
                           </FormItem>
                         )}
                       />
+                    
                       <FormField
                         control={form.control}
-                        name="availability"
+                      name="purchasingUrl"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Availability</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormLabel>Purchasing URL</FormLabel>
                               <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Select availability" />
-                                </SelectTrigger>
+                            <Input placeholder="https://example.com/product" {...field} />
                               </FormControl>
-                              <SelectContent>
-                                <SelectItem value="in-stock">In Stock</SelectItem>
-                                <SelectItem value="limited">Limited</SelectItem>
-                                <SelectItem value="out-of-stock">Out of Stock</SelectItem>
-                              </SelectContent>
-                            </Select>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-                    </div>
                     
                     <div className="grid grid-cols-3 gap-4">
                       <FormField
@@ -509,15 +328,25 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen }: ProductSuggesti
                       <FormField
                         control={form.control}
                         name="shippingCost"
-                        render={({ field }) => (
+                        render={({ field }) => {
+                          const priceValue = form.watch("price");
+                          const isDisabled = !priceValue || priceValue === 0;
+                          return (
                           <FormItem>
                             <FormLabel>Shipping Cost (€)</FormLabel>
                             <FormControl>
-                              <Input type="number" step="0.01" placeholder="5.99" {...field} />
+                                <Input 
+                                  type="number" 
+                                  step="0.01" 
+                                  placeholder="5.99" 
+                                  {...field} 
+                                  disabled={isDisabled}
+                                />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
-                        )}
+                          );
+                        }}
                       />
                       <FormField
                         control={form.control}
@@ -626,10 +455,12 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen }: ProductSuggesti
                     />
                     
                     <DialogFooter>
-                      <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
+                      <Button type="button" variant="outline" onClick={() => setDialogOpen(false)} disabled={isProductLoading}>
                         Cancel
                       </Button>
-                      <Button type="submit">Add Product</Button>
+                      <Button type="submit" disabled={isProductLoading}>
+                        {isProductLoading ? "Adding..." : "Add Product"}
+                      </Button>
                     </DialogFooter>
                   </form>
                 </Form>
@@ -761,9 +592,15 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen }: ProductSuggesti
                     <div className="flex flex-col gap-2 flex-shrink-0">
                       <div className="text-right space-y-0.5">
                         <div className="flex items-center justify-end gap-1.5">
+                          {product.price > 0 ? (
                           <div className="text-xl font-bold text-foreground">
                             €{(product.price + product.shippingCost).toFixed(2)}
                           </div>
+                          ) : (
+                            <div className="text-sm font-medium text-muted-foreground">
+                              Ask Manufacturer
+                            </div>
+                          )}
                           {product.validatedByManufacturer && (
                             <Tooltip>
                               <TooltipTrigger asChild>
@@ -775,12 +612,16 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen }: ProductSuggesti
                             </Tooltip>
                           )}
                         </div>
+                        {product.price > 0 && (
+                          <>
                         <div className="text-xs text-muted-foreground">
                           €{product.price.toFixed(2)} + €{product.shippingCost.toFixed(2)} ship
                         </div>
                         <div className="text-xs text-muted-foreground">
                           {product.estimatedShipping}
                         </div>
+                          </>
+                        )}
                       </div>
                       <div className="flex gap-1 mt-1">
                         <Button 
@@ -789,8 +630,11 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen }: ProductSuggesti
                           className="flex-1"
                           onClick={(e) => {
                             e.stopPropagation();
-                            window.open(`https://${product.brand.toLowerCase()}.com`, '_blank');
+                            if (product.purchasingUrl) {
+                              window.open(product.purchasingUrl, '_blank');
+                            }
                           }}
+                          disabled={!product.purchasingUrl}
                         >
                           <ExternalLink className="h-3 w-3 mr-1" />
                           Buy
@@ -876,9 +720,15 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen }: ProductSuggesti
                       </div>
                       <div className="text-right">
                         <div className="flex items-center justify-end gap-1.5">
+                          {product.price > 0 ? (
                           <div className="text-xl font-bold text-foreground">
                             €{product.price.toFixed(2)}
                           </div>
+                          ) : (
+                            <div className="text-sm font-medium text-muted-foreground">
+                              Ask Manufacturer
+                            </div>
+                          )}
                           {product.validatedByManufacturer && (
                             <Tooltip>
                               <TooltipTrigger asChild>
@@ -890,12 +740,16 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen }: ProductSuggesti
                             </Tooltip>
                           )}
                         </div>
+                        {product.price > 0 && (
+                          <>
                         <div className="text-xs text-muted-foreground">
                           + €{product.shippingCost.toFixed(2)} shipping
                         </div>
                         <div className="text-xs text-muted-foreground">
                           Est. delivery: {product.estimatedShipping}
                         </div>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -904,7 +758,12 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen }: ProductSuggesti
                     <Button 
                       className="flex-1" 
                       size="sm"
-                      onClick={() => window.open(`https://${product.brand.toLowerCase()}.com`, '_blank')}
+                      onClick={() => {
+                        if (product.purchasingUrl) {
+                          window.open(product.purchasingUrl, '_blank');
+                        }
+                      }}
+                      disabled={!product.purchasingUrl}
                     >
                       <ExternalLink className="mr-2 h-3 w-3" />
                       Buy from Manufacturer

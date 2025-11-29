@@ -1,37 +1,41 @@
 import { useState, useEffect } from "react";
-import { MessageSquare, Send, Loader2, X, Hash } from "lucide-react";
+import { MessageSquare, Send, Loader2, X, Hash, Search, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Toggle } from "@/components/ui/toggle";
 
 interface Message {
-  id: string;
-  role: "user" | "assistant";
+  id: number;
+  conversationId: number;
+  role: string;
   content: string;
-  timestamp: Date;
+  timestamp: string;
+  metadata?: any;
 }
-
-const initialMessages: Message[] = [
-  {
-    id: "1",
-    role: "assistant",
-    content: "Hello! I'm your AI assistant for finding spare parts. What are you looking for today?",
-    timestamp: new Date(),
-  },
-];
 
 interface ChatInterfaceProps {
   isOpen: boolean;
   onToggle: () => void;
+  messages?: Message[];
+  isLoading?: boolean;
+  onSendMessage?: (message: string, searchByPartNumber: boolean) => void;
 }
 
-export const ChatInterface = ({ isOpen, onToggle }: ChatInterfaceProps) => {
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
+export const ChatInterface = ({ 
+  isOpen, 
+  onToggle,
+  messages: externalMessages = [],
+  isLoading: externalLoading = false,
+  onSendMessage,
+}: ChatInterfaceProps) => {
   const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [searchByPartNumber, setSearchByPartNumber] = useState(false);
   const [useFloatingMode, setUseFloatingMode] = useState(false);
+  
+  // Use external messages or local state
+  const messages = externalMessages;
+  const isLoading = externalLoading;
 
   useEffect(() => {
     const checkOverflow = () => {
@@ -48,35 +52,15 @@ export const ChatInterface = ({ isOpen, onToggle }: ChatInterfaceProps) => {
     return () => window.removeEventListener('resize', checkOverflow);
   }, []);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!input.trim()) return;
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: "user",
-      content: input,
-      timestamp: new Date(),
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
+    const messageContent = input;
     setInput("");
-    setIsLoading(true);
 
-    // Simulate AI response
-    setTimeout(() => {
-      const responseContent = searchByPartNumber
-        ? `Searching for part number: ${input}. I'll look for exact matches in our catalog.`
-        : "I found several parts matching your search. Check the suggestions panel for details and pricing.";
-      
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: responseContent,
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, aiMessage]);
-      setIsLoading(false);
-    }, 1000);
+    if (onSendMessage) {
+      await onSendMessage(messageContent, searchByPartNumber);
+    }
   };
 
   return (
@@ -111,25 +95,82 @@ export const ChatInterface = ({ isOpen, onToggle }: ChatInterfaceProps) => {
       {/* Messages */}
       <ScrollArea className="flex-1 px-6 min-h-0 transition-opacity duration-300">
         <div className="space-y-4 py-6">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
-            >
-              <div
-                className={`max-w-[80%] rounded-lg px-4 py-3 break-words transition-all duration-200 ease-in-out ${
-                  message.role === "user"
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-card text-foreground"
-                }`}
-              >
-                <p className="text-sm break-words">{message.content}</p>
-                <p className="mt-1 text-xs opacity-70">
-                  {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                </p>
+          {messages && messages.length > 0 ? (
+            messages.map((message) => {
+              try {
+                return (
+                  <div
+                    key={message.id}
+                    className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
+                  >
+                    <div
+                      className={`max-w-[80%] rounded-lg px-4 py-3 break-words transition-all duration-200 ease-in-out ${
+                        message.role === "user"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-card text-foreground"
+                      }`}
+                    >
+                      <p className="text-sm break-words">{message.content || ''}</p>
+                      <p className="mt-1 text-xs opacity-70">
+                        {new Date(message.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                      </p>
+                    </div>
+                  </div>
+                );
+              } catch (error) {
+                console.error('Error rendering message:', message, error);
+                return null;
+              }
+            })
+          ) : (
+            !isLoading && (
+              <div className="flex items-center justify-center h-full px-6">
+                <div className="max-w-md text-center space-y-6">
+                  {/* Icon */}
+                  <div className="flex items-center justify-center">
+                    <div className="relative">
+                      <Search className="h-16 w-16 text-muted-foreground/40" />
+                      <Sparkles className="h-6 w-6 text-primary absolute -top-1 -right-1" />
+                    </div>
+                  </div>
+                  
+                  {/* Welcome Message */}
+                  <div className="space-y-2">
+                    <h3 className="text-lg font-semibold text-foreground">
+                      Start Your Search
+                    </h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Describe the spare part you're looking for, and I'll help you find the best options with pricing and availability.
+                    </p>
+                  </div>
+                  
+                  {/* Examples */}
+                  <div className="space-y-2">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                      Try asking:
+                    </p>
+                    <div className="flex flex-col gap-2">
+                      <div className="rounded-lg bg-muted/50 px-3 py-2 text-left">
+                        <p className="text-xs text-muted-foreground">
+                          "Find me an iPhone 14 Pro screen"
+                        </p>
+                      </div>
+                      <div className="rounded-lg bg-muted/50 px-3 py-2 text-left">
+                        <p className="text-xs text-muted-foreground">
+                          "Search for Samsung Galaxy S23 battery"
+                        </p>
+                      </div>
+                      <div className="rounded-lg bg-muted/50 px-3 py-2 text-left">
+                        <p className="text-xs text-muted-foreground">
+                          "LCD-IP14P-OL" (search by part number)
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          )}
           {isLoading && (
             <div className="flex justify-start">
               <div className="rounded-lg bg-card px-4 py-3">
