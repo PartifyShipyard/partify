@@ -33,6 +33,8 @@ interface Product {
   images: string[];
   description: string;
   compatibleModels: string[];
+  shippingCountry: string;
+  stock: number;
 }
 
 const productFormSchema = z.object({
@@ -47,6 +49,8 @@ const productFormSchema = z.object({
   image: z.string().trim().url("Must be a valid URL"),
   description: z.string().trim().min(1, "Description is required").max(500, "Description must be less than 500 characters"),
   compatibleModels: z.string().trim().min(1, "Compatible models are required").max(500, "Compatible models must be less than 500 characters"),
+  shippingCountry: z.string().trim().min(1, "Shipping country is required").max(50, "Shipping country must be less than 50 characters"),
+  stock: z.coerce.number().int().min(0, "Stock must be 0 or positive").max(99999, "Stock is too high"),
 });
 
 type ProductFormValues = z.infer<typeof productFormSchema>;
@@ -70,6 +74,8 @@ const mockProducts: Product[] = [
     ],
     description: "Original quality OLED replacement display with digitizer assembly",
     compatibleModels: ["iPhone 14 Pro", "iPhone 14 Pro Max"],
+    shippingCountry: "USA",
+    stock: 45,
   },
   {
     id: "2",
@@ -88,6 +94,8 @@ const mockProducts: Product[] = [
     ],
     description: "3900mAh replacement battery with installation tools",
     compatibleModels: ["Samsung Galaxy S23", "Samsung Galaxy S23+"],
+    shippingCountry: "South Korea",
+    stock: 128,
   },
   {
     id: "3",
@@ -107,6 +115,8 @@ const mockProducts: Product[] = [
     ],
     description: "OEM quality battery with all necessary tools and adhesive strips",
     compatibleModels: ["MacBook Pro 16-inch M1 2021", "MacBook Pro 16-inch M2 2023"],
+    shippingCountry: "USA",
+    stock: 12,
   },
   {
     id: "4",
@@ -125,6 +135,8 @@ const mockProducts: Product[] = [
     ],
     description: "Replacement charging port flex cable assembly for USB-C devices",
     compatibleModels: ["Samsung Galaxy S21-S24", "Google Pixel 6-8", "OnePlus 9-11"],
+    shippingCountry: "China",
+    stock: 234,
   },
   {
     id: "5",
@@ -143,6 +155,8 @@ const mockProducts: Product[] = [
     ],
     description: "12MP rear camera replacement module with flex cable",
     compatibleModels: ["iPad Pro 11-inch 2020-2022", "iPad Pro 12.9-inch 2020-2022"],
+    shippingCountry: "USA",
+    stock: 67,
   },
   {
     id: "6",
@@ -161,6 +175,8 @@ const mockProducts: Product[] = [
     ],
     description: "Universal laptop speaker set with connection cables",
     compatibleModels: ["HP Pavilion 15", "Dell Inspiron 15", "Lenovo IdeaPad"],
+    shippingCountry: "China",
+    stock: 189,
   },
   {
     id: "7",
@@ -179,6 +195,8 @@ const mockProducts: Product[] = [
     ],
     description: "Professional phone repair toolkit with precision screwdrivers and pry tools",
     compatibleModels: ["iPhone All Models", "Samsung Galaxy All Models", "Google Pixel All Models"],
+    shippingCountry: "USA",
+    stock: 312,
   },
   {
     id: "8",
@@ -196,6 +214,8 @@ const mockProducts: Product[] = [
     ],
     description: "Pre-cut adhesive strips for display and battery replacements",
     compatibleModels: ["iPhone 12-15", "Samsung Galaxy S20-S24", "Google Pixel 6-8"],
+    shippingCountry: "USA",
+    stock: 8,
   },
   {
     id: "9",
@@ -214,6 +234,8 @@ const mockProducts: Product[] = [
     ],
     description: "Complete button set for Joy-Con controller repair",
     compatibleModels: ["Nintendo Switch Original", "Nintendo Switch OLED"],
+    shippingCountry: "Japan",
+    stock: 156,
   },
   {
     id: "10",
@@ -232,6 +254,8 @@ const mockProducts: Product[] = [
     ],
     description: "US layout laptop keyboard with backlight support",
     compatibleModels: ["HP ProBook 450", "Dell Latitude 5420", "Lenovo ThinkPad E15"],
+    shippingCountry: "China",
+    stock: 94,
   },
 ];
 
@@ -260,6 +284,8 @@ export const ProductSuggestions = () => {
       image: "",
       description: "",
       compatibleModels: "",
+      shippingCountry: "",
+      stock: 0,
     },
   });
 
@@ -328,6 +354,8 @@ export const ProductSuggestions = () => {
       images: [data.image],
       description: data.description,
       compatibleModels: data.compatibleModels.split(',').map(m => m.trim()),
+      shippingCountry: data.shippingCountry,
+      stock: data.stock,
     };
     
     setProducts([newProduct, ...products]);
@@ -531,6 +559,35 @@ export const ProductSuggestions = () => {
                       )}
                     />
                     
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="shippingCountry"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Shipping Country</FormLabel>
+                            <FormControl>
+                              <Input placeholder="USA" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="stock"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Stock Amount</FormLabel>
+                            <FormControl>
+                              <Input type="number" placeholder="100" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    
                     <FormField
                       control={form.control}
                       name="validatedByManufacturer"
@@ -678,6 +735,14 @@ export const ProductSuggestions = () => {
                       </div>
                       <p className="text-sm text-muted-foreground">{product.brand}</p>
                       <p className="mt-1 text-xs text-muted-foreground">#{product.partNumber}</p>
+                      <div className="flex gap-2 mt-1">
+                        <Badge variant="secondary" className="text-xs">
+                          Ships from: {product.shippingCountry}
+                        </Badge>
+                        <Badge variant="secondary" className="text-xs">
+                          Stock: {product.stock}
+                        </Badge>
+                      </div>
                     </div>
                   </div>
                   {expandedId !== product.id && (
@@ -772,9 +837,19 @@ export const ProductSuggestions = () => {
 
                   <div className="mb-3 space-y-2">
                     <div className="flex items-center justify-between">
-                      <Badge className={getAvailabilityColor(product.availability)}>
-                        {product.availability.replace("-", " ")}
-                      </Badge>
+                      <div className="flex flex-col gap-1">
+                        <Badge className={getAvailabilityColor(product.availability)}>
+                          {product.availability.replace("-", " ")}
+                        </Badge>
+                        <div className="flex gap-1">
+                          <Badge variant="outline" className="text-xs">
+                            Ships from: {product.shippingCountry}
+                          </Badge>
+                          <Badge variant="outline" className="text-xs">
+                            Stock: {product.stock}
+                          </Badge>
+                        </div>
+                      </div>
                       <div className="text-right">
                         <div className="text-xl font-bold text-foreground">
                           €{product.price.toFixed(2)}
