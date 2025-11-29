@@ -638,19 +638,6 @@ export const ProductSuggestions = () => {
             <Card key={product.id} className="overflow-hidden">
               <CardHeader className="p-4">
                 <div className="flex items-start justify-between gap-3">
-                  <div className="flex flex-col gap-2 flex-shrink-0">
-                    {expandedId !== product.id && (
-                      <>
-                        <div className="text-xl font-bold text-foreground">
-                          €{product.price.toFixed(2)}
-                        </div>
-                        <div className="text-xs text-muted-foreground space-y-0.5">
-                          <div>+ €{product.shippingCost.toFixed(2)} shipping</div>
-                          <div>{product.estimatedShipping}</div>
-                        </div>
-                      </>
-                    )}
-                  </div>
                   <div className="flex gap-3 flex-1 min-w-0 items-center">
                     {expandedId !== product.id && (
                       <img
@@ -673,6 +660,17 @@ export const ProductSuggestions = () => {
                       <p className="mt-1 text-xs text-muted-foreground">#{product.partNumber}</p>
                     </div>
                   </div>
+                  {expandedId !== product.id && (
+                    <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                      <div className="text-xl font-bold text-foreground">
+                        €{(product.price + product.shippingCost).toFixed(2)}
+                      </div>
+                      <div className="text-xs text-muted-foreground text-right space-y-0.5">
+                        <div>€{product.price.toFixed(2)} + €{product.shippingCost.toFixed(2)} ship</div>
+                        <div>{product.estimatedShipping}</div>
+                      </div>
+                    </div>
+                  )}
                   <Button
                     variant="ghost"
                     size="icon"
