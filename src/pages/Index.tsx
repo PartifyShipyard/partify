@@ -55,14 +55,16 @@ const Index = () => {
   }
 
   return (
-    <div className={`flex h-full min-h-0 w-full overflow-hidden relative ${isMobile ? 'flex-col' : ''}`}>
-      <ChatSidebar
-        isCollapsed={isSidebarCollapsed}
-        onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-      />
-      <div className={`flex flex-1 min-h-0 ${isMobile ? 'flex-col' : ''}`}>
-        <ProductSuggestions />
-        <ChatInterface isOpen={isChatOpen} onToggle={() => setIsChatOpen(!isChatOpen)} />
+    <div className="flex h-full min-h-0 w-full overflow-hidden relative justify-center bg-background">
+      <div className={`flex h-full min-h-0 w-full max-w-[1920px] overflow-hidden relative ${isMobile ? 'flex-col' : ''}`}>
+        <ChatSidebar
+          isCollapsed={isSidebarCollapsed}
+          onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+        />
+        <div className={`flex flex-1 min-h-0 ${isMobile ? 'flex-col' : ''}`}>
+          <ProductSuggestions onChatToggle={() => setIsChatOpen(!isChatOpen)} isChatOpen={isChatOpen} />
+          <ChatInterface isOpen={isChatOpen} onToggle={() => setIsChatOpen(!isChatOpen)} />
+        </div>
       </div>
     </div>
   );

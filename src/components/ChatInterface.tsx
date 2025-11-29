@@ -89,23 +89,14 @@ export const ChatInterface = ({ isOpen, onToggle }: ChatInterfaceProps) => {
         />
       )}
 
-      {!isOpen && (
-        <Button
-          onClick={onToggle}
-          size="icon"
-          className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg transition-all duration-300 ease-in-out"
-        >
-          <MessageSquare className="h-6 w-6" />
-        </Button>
-      )}
-      <div className={`flex h-full flex-col border-l border-border bg-background transition-all duration-300 ease-in-out
+      <div className={`flex h-full flex-col bg-background transition-all duration-300 ease-in-out
         ${useFloatingMode
           ? `fixed z-50 inset-0 w-full ${isOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}`
-          : `relative z-0 ${isOpen ? 'w-96 opacity-100' : 'w-0 opacity-0 border-l-0 overflow-hidden'}`
+          : `relative z-0 ${isOpen ? 'w-96 opacity-100' : 'w-0 opacity-0 overflow-hidden'}`
         }
       `}>
       {/* Chat Header */}
-      <div className="h-[72px] flex items-center border-b border-border px-4 flex-shrink-0 transition-opacity duration-300">
+      <div className="h-[88px] flex items-center px-4 flex-shrink-0 transition-opacity duration-300">
         <div className="flex items-start justify-between w-full">
           <div className="min-w-0 flex-1 pr-2">
             <h1 className="text-xl font-semibold text-foreground truncate">Search Spare Parts</h1>
@@ -129,7 +120,7 @@ export const ChatInterface = ({ isOpen, onToggle }: ChatInterfaceProps) => {
                 className={`max-w-[80%] rounded-lg px-4 py-3 break-words transition-all duration-200 ease-in-out ${
                   message.role === "user"
                     ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-foreground"
+                    : "bg-card text-foreground"
                 }`}
               >
                 <p className="text-sm break-words">{message.content}</p>
@@ -141,7 +132,7 @@ export const ChatInterface = ({ isOpen, onToggle }: ChatInterfaceProps) => {
           ))}
           {isLoading && (
             <div className="flex justify-start">
-              <div className="rounded-lg bg-muted px-4 py-3">
+              <div className="rounded-lg bg-card px-4 py-3">
                 <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
               </div>
             </div>
@@ -150,7 +141,7 @@ export const ChatInterface = ({ isOpen, onToggle }: ChatInterfaceProps) => {
       </ScrollArea>
 
       {/* Input Area */}
-      <div className="border-t border-border p-4 flex-shrink-0 transition-opacity duration-300">
+      <div className="p-4 flex-shrink-0 transition-opacity duration-300">
         <div className="flex items-center gap-2 mb-2">
           <Toggle
             pressed={searchByPartNumber}

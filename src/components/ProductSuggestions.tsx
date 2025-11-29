@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronDown, ChevronUp, ExternalLink, ShoppingCart, X, Filter, CheckCircle, ArrowUpDown, Plus, Maximize2 } from "lucide-react";
+import { ChevronDown, ChevronUp, ExternalLink, ShoppingCart, X, Filter, CheckCircle, ArrowUpDown, Plus, Maximize2, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -260,7 +260,12 @@ const mockProducts: Product[] = [
   },
 ];
 
-export const ProductSuggestions = () => {
+interface ProductSuggestionsProps {
+  onChatToggle?: () => void;
+  isChatOpen?: boolean;
+}
+
+export const ProductSuggestions = ({ onChatToggle, isChatOpen }: ProductSuggestionsProps = {}) => {
   const { toast } = useToast();
   const [products, setProducts] = useState<Product[]>(mockProducts);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -381,17 +386,27 @@ export const ProductSuggestions = () => {
 
   return (
     <TooltipProvider>
-      <div className="flex h-screen flex-1 flex-col border-r border-border bg-card">
+      <div className="flex h-screen flex-1 flex-col bg-card">
       {/* Header */}
-      <div className="border-b border-border h-[64px] flex items-center px-4">
-        <div className="w-full">
+      <div className="h-[88px] flex items-center justify-between px-4">
+        <div className="flex-1">
           <h2 className="text-lg font-semibold text-foreground">Search Results</h2>
           <p className="text-sm text-muted-foreground">{sortedProducts.length} parts found</p>
         </div>
+        {onChatToggle && !isChatOpen && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onChatToggle}
+            className="flex-shrink-0 group"
+          >
+            <MessageSquare className="h-5 w-5 text-foreground group-hover:text-primary group-hover:fill-primary" />
+          </Button>
+        )}
       </div>
 
       {/* Controls: Filtering and Sorting */}
-      <div className="sticky top-0 z-10 bg-card border-b border-border h-[64px] flex items-center px-4">
+      <div className="sticky top-0 z-10 bg-card h-[64px] flex items-center px-4" style={{ boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
         <div className="flex items-center justify-between w-full">
           <div className="flex items-center gap-2">
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -626,7 +641,7 @@ export const ProductSuggestions = () => {
               <ArrowUpDown className="h-4 w-4 mr-2" />
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-card">
                 <SelectItem value="default">Default</SelectItem>
                 <SelectItem value="price-low">Price: Low to High</SelectItem>
                 <SelectItem value="price-high">Price: High to Low</SelectItem>
@@ -805,18 +820,18 @@ export const ProductSuggestions = () => {
 
               {expandedId === product.id && (
                 <CardContent className="p-4 pt-0">
-                  <Carousel className="mb-3 max-h-[400px]">
-                    <CarouselContent>
+                  <Carousel className="mb-3 h-[400px]">
+                    <CarouselContent className="h-[400px]">
                       {product.images.map((img, index) => (
-                        <CarouselItem key={index}>
+                        <CarouselItem key={index} className="h-[400px]">
                           <div 
-                            className="relative group cursor-pointer h-[400px] flex items-center justify-center"
+                            className="relative group cursor-pointer h-full flex items-center justify-center"
                             onClick={() => setFullscreenImage(img)}
                           >
                             <img
                               src={img}
                               alt={`${product.name} - Image ${index + 1}`}
-                              className="max-h-[400px] w-full rounded-lg object-contain bg-muted"
+                              className="h-full w-full rounded-lg object-contain bg-muted"
                               onError={(e) => {
                                 e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200' viewBox='0 0 400 200'%3E%3Crect fill='%23f0f0f0' width='400' height='200'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23999' font-family='sans-serif' font-size='16'%3ENo Image Available%3C/text%3E%3C/svg%3E";
                               }}

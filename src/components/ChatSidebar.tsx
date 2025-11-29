@@ -62,7 +62,7 @@ export const ChatSidebar = ({ isCollapsed, onToggle }: ChatSidebarProps) => {
   if (isMobile) {
     return (
       <>
-        <div className="flex h-16 w-full items-center justify-between border-b border-border bg-card px-4">
+        <div className="flex h-16 w-full items-center justify-between bg-background px-4">
           <Sheet open={showMobileMenu} onOpenChange={setShowMobileMenu}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
@@ -126,7 +126,7 @@ export const ChatSidebar = ({ isCollapsed, onToggle }: ChatSidebarProps) => {
                 </ScrollArea>
 
                 {/* Account Section in Sheet */}
-                <div className="border-t border-border p-3">
+                <div className="p-3">
                   <UserProfileDropdown showName={true} />
                 </div>
               </div>
@@ -173,9 +173,9 @@ export const ChatSidebar = ({ isCollapsed, onToggle }: ChatSidebarProps) => {
 
   // Desktop Sidebar Navigation
   return (
-    <div className={`flex h-screen flex-col border-r border-border bg-card transition-all duration-300 ease-in-out ${isCollapsed ? 'w-16' : 'w-64'}`}>
+    <div className={`flex h-screen flex-col bg-background transition-all duration-300 ease-in-out ${isCollapsed ? 'w-16' : 'w-64'}`}>
       {/* Header */}
-      <div className={`flex items-center h-[72px] px-4 border-b border-border transition-all duration-300 ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
+      <div className={`flex items-center h-[72px] px-4 transition-all duration-300 ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
         {!isCollapsed && <h2 className="text-lg font-semibold text-foreground transition-opacity duration-300">partify</h2>}
         <div className={`flex gap-1 transition-all duration-300 ${isCollapsed ? 'flex-col' : ''}`}>
           <Button variant="ghost" size="icon" onClick={onToggle}>
@@ -261,7 +261,7 @@ export const ChatSidebar = ({ isCollapsed, onToggle }: ChatSidebarProps) => {
       </ScrollArea>
 
       {/* Account Section */}
-      <div className="p-3 border-t border-border transition-all duration-300">
+      <div className="p-3 transition-all duration-300">
         {!isCollapsed ? (
           <UserProfileDropdown showName={true} />
         ) : (
