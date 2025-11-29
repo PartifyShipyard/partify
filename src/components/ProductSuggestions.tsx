@@ -242,6 +242,12 @@ export const ProductSuggestions = () => {
         return b.price - a.price;
       case "validated":
         return (b.validatedByManufacturer ? 1 : 0) - (a.validatedByManufacturer ? 1 : 0);
+      case "delivery-fast":
+        const getDays = (shipping: string) => {
+          const match = shipping.match(/(\d+)-?(\d+)?/);
+          return match ? parseInt(match[1]) : 999;
+        };
+        return getDays(a.estimatedShipping) - getDays(b.estimatedShipping);
       default:
         return 0;
     }
@@ -517,12 +523,13 @@ export const ProductSuggestions = () => {
               <ArrowUpDown className="h-4 w-4 mr-2" />
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="default">Default</SelectItem>
-              <SelectItem value="price-low">Price: Low to High</SelectItem>
-              <SelectItem value="price-high">Price: High to Low</SelectItem>
-              <SelectItem value="validated">Validated First</SelectItem>
-            </SelectContent>
+              <SelectContent>
+                <SelectItem value="default">Default</SelectItem>
+                <SelectItem value="price-low">Price: Low to High</SelectItem>
+                <SelectItem value="price-high">Price: High to Low</SelectItem>
+                <SelectItem value="validated">Validated First</SelectItem>
+                <SelectItem value="delivery-fast">Fastest Delivery</SelectItem>
+              </SelectContent>
             </Select>
           </div>
           <div className="flex gap-1">
@@ -631,6 +638,19 @@ export const ProductSuggestions = () => {
             <Card key={product.id} className="overflow-hidden">
               <CardHeader className="p-4">
                 <div className="flex items-start justify-between gap-3">
+                  <div className="flex flex-col gap-2 flex-shrink-0">
+                    {expandedId !== product.id && (
+                      <>
+                        <div className="text-xl font-bold text-foreground">
+                          €{product.price.toFixed(2)}
+                        </div>
+                        <div className="text-xs text-muted-foreground space-y-0.5">
+                          <div>+ €{product.shippingCost.toFixed(2)} shipping</div>
+                          <div>{product.estimatedShipping}</div>
+                        </div>
+                      </>
+                    )}
+                  </div>
                   <div className="flex gap-3 flex-1 min-w-0 items-center">
                     {expandedId !== product.id && (
                       <img
@@ -651,11 +671,6 @@ export const ProductSuggestions = () => {
                       </div>
                       <p className="text-sm text-muted-foreground">{product.brand}</p>
                       <p className="mt-1 text-xs text-muted-foreground">#{product.partNumber}</p>
-                      {expandedId !== product.id && (
-                        <p className="mt-1 text-lg font-bold text-foreground">
-                          €{product.price.toFixed(2)}
-                        </p>
-                      )}
                     </div>
                   </div>
                   <Button
