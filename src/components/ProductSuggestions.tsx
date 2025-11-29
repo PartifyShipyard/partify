@@ -735,14 +735,8 @@ export const ProductSuggestions = () => {
                       </div>
                       <p className="text-sm text-muted-foreground">{product.brand}</p>
                       <p className="mt-1 text-xs text-muted-foreground">#{product.partNumber}</p>
-                      <div className="flex gap-2 mt-1">
-                        <Badge variant="secondary" className="text-xs">
-                          Ships from: {product.shippingCountry}
-                        </Badge>
-                        <Badge variant="secondary" className="text-xs">
-                          Stock: {product.stock}
-                        </Badge>
-                      </div>
+                      <p className="text-xs text-muted-foreground">Ships from: {product.shippingCountry}</p>
+                      <p className="text-xs text-muted-foreground">Stock: {product.stock}</p>
                     </div>
                   </div>
                   {expandedId !== product.id && (
@@ -836,19 +830,13 @@ export const ProductSuggestions = () => {
                   </div>
 
                   <div className="mb-3 space-y-2">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-start justify-between">
                       <div className="flex flex-col gap-1">
                         <Badge className={getAvailabilityColor(product.availability)}>
                           {product.availability.replace("-", " ")}
                         </Badge>
-                        <div className="flex gap-1">
-                          <Badge variant="outline" className="text-xs">
-                            Ships from: {product.shippingCountry}
-                          </Badge>
-                          <Badge variant="outline" className="text-xs">
-                            Stock: {product.stock}
-                          </Badge>
-                        </div>
+                        <p className="text-xs text-muted-foreground">Ships from: {product.shippingCountry}</p>
+                        <p className="text-xs text-muted-foreground">Stock: {product.stock}</p>
                       </div>
                       <div className="text-right">
                         <div className="text-xl font-bold text-foreground">
