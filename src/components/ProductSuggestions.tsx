@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { ChevronDown, ChevronUp, ExternalLink, ShoppingCart, Grid3x3, List, X } from "lucide-react";
+import { ChevronDown, ChevronUp, ExternalLink, ShoppingCart, Grid3x3, List, X, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 interface Product {
   id: string;
@@ -62,6 +63,7 @@ export const ProductSuggestions = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
   const [selectedModels, setSelectedModels] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   // Extract unique models and categories
   const allModels = Array.from(new Set(mockProducts.flatMap((p) => p.compatibleModels)));
@@ -115,6 +117,13 @@ export const ProductSuggestions = () => {
           </div>
           <div className="flex gap-1">
             <Button
+              variant={filtersOpen ? "secondary" : "ghost"}
+              size="icon"
+              onClick={() => setFiltersOpen(!filtersOpen)}
+            >
+              <Filter className="h-4 w-4" />
+            </Button>
+            <Button
               variant={viewMode === "list" ? "secondary" : "ghost"}
               size="icon"
               onClick={() => setViewMode("list")}
@@ -132,49 +141,62 @@ export const ProductSuggestions = () => {
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="border-b border-border p-4 space-y-3">
-        <div className="flex items-center justify-between">
-          <p className="text-sm font-medium text-foreground">Filter by Model</p>
-          {(selectedModels.length > 0 || selectedCategories.length > 0) && (
-            <Button variant="ghost" size="sm" onClick={clearFilters}>
-              Clear All
-            </Button>
-          )}
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {allModels.map((model) => (
-            <Badge
-              key={model}
-              variant={selectedModels.includes(model) ? "default" : "outline"}
-              className="cursor-pointer hover:bg-primary/20"
-              onClick={() => toggleModel(model)}
-            >
-              {model}
-              {selectedModels.includes(model) && (
-                <X className="ml-1 h-3 w-3" />
+      {/* Collapsible Filters */}
+      <Collapsible open={filtersOpen} onOpenChange={setFiltersOpen}>
+        <CollapsibleContent className="border-b border-border">
+          <div className="p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium text-foreground">Filter by Model</p>
+              {(selectedModels.length > 0 || selectedCategories.length > 0) && (
+                <Button variant="ghost" size="sm" onClick={clearFilters}>
+                  Clear All
+                </Button>
               )}
-            </Badge>
-          ))}
-        </div>
-        
-        <p className="text-sm font-medium text-foreground pt-2">Filter by Category</p>
-        <div className="flex flex-wrap gap-2">
-          {allCategories.map((category) => (
-            <Badge
-              key={category}
-              variant={selectedCategories.includes(category) ? "default" : "outline"}
-              className="cursor-pointer hover:bg-primary/20"
-              onClick={() => toggleCategory(category)}
-            >
-              {category}
-              {selectedCategories.includes(category) && (
-                <X className="ml-1 h-3 w-3" />
-              )}
-            </Badge>
-          ))}
-        </div>
-      </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {allModels.map((model) => (
+                <Badge
+                  key={model}
+                  variant={selectedModels.includes(model) ? "default" : "outline"}
+                  className="cursor-pointer hover:bg-primary/20"
+                  onClick={() => toggleModel(model)}
+                >
+                  {model}
+                  {selectedModels.includes(model) && (
+                    <X className="ml-1 h-3 w-3" />
+                  )}
+                </Badge>
+              ))}
+            </div>
+            
+            <Collapsible>
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" size="sm" className="w-full justify-between mt-2">
+                  <span className="text-sm font-medium">Filter by Category</span>
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="mt-2">
+                <div className="flex flex-wrap gap-2">
+                  {allCategories.map((category) => (
+                    <Badge
+                      key={category}
+                      variant={selectedCategories.includes(category) ? "default" : "outline"}
+                      className="cursor-pointer hover:bg-primary/20"
+                      onClick={() => toggleCategory(category)}
+                    >
+                      {category}
+                      {selectedCategories.includes(category) && (
+                        <X className="ml-1 h-3 w-3" />
+                      )}
+                    </Badge>
+                  ))}
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
 
       {/* Products List */}
       <ScrollArea className="flex-1">
