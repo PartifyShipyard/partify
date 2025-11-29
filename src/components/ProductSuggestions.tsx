@@ -164,7 +164,7 @@ export const ProductSuggestions = () => {
                       </CollapsibleContent>
                     </Collapsible>
                     
-                    <Collapsible>
+                    <Collapsible defaultOpen>
                       <CollapsibleTrigger asChild>
                         <Button variant="ghost" size="sm" className="w-full justify-between">
                           <span className="text-sm font-medium">Filter by Producer</span>
