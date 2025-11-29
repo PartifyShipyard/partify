@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronDown, ChevronUp, ExternalLink, ShoppingCart, Grid3x3, List } from "lucide-react";
+import { ChevronDown, ChevronUp, ExternalLink, ShoppingCart, Grid3x3, List, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +14,8 @@ interface Product {
   availability: "in-stock" | "limited" | "out-of-stock";
   image: string;
   description: string;
+  compatibleModels: string[];
+  category: string;
 }
 
 const mockProducts: Product[] = [
@@ -26,6 +28,8 @@ const mockProducts: Product[] = [
     availability: "in-stock",
     image: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400",
     description: "High-performance ceramic brake pads for front axle",
+    compatibleModels: ["Honda Civic 2020-2024", "Honda Accord 2019-2024", "Toyota Camry 2018-2023"],
+    category: "Brakes",
   },
   {
     id: "2",
@@ -36,6 +40,8 @@ const mockProducts: Product[] = [
     availability: "in-stock",
     image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=400",
     description: "Reliable brake pads for everyday use",
+    compatibleModels: ["Ford F-150 2015-2023", "Chevrolet Silverado 2016-2024"],
+    category: "Brakes",
   },
   {
     id: "3",
@@ -46,12 +52,46 @@ const mockProducts: Product[] = [
     availability: "limited",
     image: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=400",
     description: "Complete brake upgrade kit with rotors and pads",
+    compatibleModels: ["BMW 3 Series 2017-2024", "Audi A4 2018-2024"],
+    category: "Brakes",
   },
 ];
 
 export const ProductSuggestions = () => {
   const [expandedId, setExpandedId] = useState<string | null>("1");
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
+  const [selectedModels, setSelectedModels] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+
+  // Extract unique models and categories
+  const allModels = Array.from(new Set(mockProducts.flatMap((p) => p.compatibleModels)));
+  const allCategories = Array.from(new Set(mockProducts.map((p) => p.category)));
+
+  // Filter products
+  const filteredProducts = mockProducts.filter((product) => {
+    const modelMatch = selectedModels.length === 0 || 
+      product.compatibleModels.some((model) => selectedModels.includes(model));
+    const categoryMatch = selectedCategories.length === 0 || 
+      selectedCategories.includes(product.category);
+    return modelMatch && categoryMatch;
+  });
+
+  const toggleModel = (model: string) => {
+    setSelectedModels((prev) =>
+      prev.includes(model) ? prev.filter((m) => m !== model) : [...prev, model]
+    );
+  };
+
+  const toggleCategory = (category: string) => {
+    setSelectedCategories((prev) =>
+      prev.includes(category) ? prev.filter((c) => c !== category) : [...prev, category]
+    );
+  };
+
+  const clearFilters = () => {
+    setSelectedModels([]);
+    setSelectedCategories([]);
+  };
 
   const getAvailabilityColor = (availability: Product["availability"]) => {
     switch (availability) {
@@ -71,7 +111,7 @@ export const ProductSuggestions = () => {
         <div className="flex items-center justify-between w-full">
           <div>
             <h2 className="text-lg font-semibold text-foreground">Suggested Parts</h2>
-            <p className="text-sm text-muted-foreground">{mockProducts.length} results found</p>
+            <p className="text-sm text-muted-foreground">{filteredProducts.length} results found</p>
           </div>
           <div className="flex gap-1">
             <Button
@@ -92,10 +132,54 @@ export const ProductSuggestions = () => {
         </div>
       </div>
 
+      {/* Filters */}
+      <div className="border-b border-border p-4 space-y-3">
+        <div className="flex items-center justify-between">
+          <p className="text-sm font-medium text-foreground">Filter by Model</p>
+          {(selectedModels.length > 0 || selectedCategories.length > 0) && (
+            <Button variant="ghost" size="sm" onClick={clearFilters}>
+              Clear All
+            </Button>
+          )}
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {allModels.map((model) => (
+            <Badge
+              key={model}
+              variant={selectedModels.includes(model) ? "default" : "outline"}
+              className="cursor-pointer hover:bg-primary/20"
+              onClick={() => toggleModel(model)}
+            >
+              {model}
+              {selectedModels.includes(model) && (
+                <X className="ml-1 h-3 w-3" />
+              )}
+            </Badge>
+          ))}
+        </div>
+        
+        <p className="text-sm font-medium text-foreground pt-2">Filter by Category</p>
+        <div className="flex flex-wrap gap-2">
+          {allCategories.map((category) => (
+            <Badge
+              key={category}
+              variant={selectedCategories.includes(category) ? "default" : "outline"}
+              className="cursor-pointer hover:bg-primary/20"
+              onClick={() => toggleCategory(category)}
+            >
+              {category}
+              {selectedCategories.includes(category) && (
+                <X className="ml-1 h-3 w-3" />
+              )}
+            </Badge>
+          ))}
+        </div>
+      </div>
+
       {/* Products List */}
       <ScrollArea className="flex-1">
         <div className={viewMode === "grid" ? "grid grid-cols-2 gap-3 p-4" : "space-y-3 p-4"}>
-          {mockProducts.map((product) => (
+          {filteredProducts.map((product) => (
             <Card key={product.id} className="overflow-hidden">
               <CardHeader className="p-4">
                 <div className="flex items-start justify-between gap-3">
@@ -141,6 +225,17 @@ export const ProductSuggestions = () => {
                     className="mb-3 h-32 w-full rounded-lg object-cover"
                   />
                   <p className="mb-3 text-sm text-muted-foreground">{product.description}</p>
+
+                  <div className="mb-3 space-y-2">
+                    <div className="flex flex-wrap gap-1">
+                      <span className="text-xs font-medium text-muted-foreground">Compatible:</span>
+                      {product.compatibleModels.map((model) => (
+                        <Badge key={model} variant="secondary" className="text-xs">
+                          {model}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
 
                   <div className="mb-3 flex items-center justify-between">
                     <Badge className={getAvailabilityColor(product.availability)}>
