@@ -2,6 +2,16 @@ import { History, Plus, User, Settings, Moon, Sun, Menu, X, Trash2 } from "lucid
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useTheme } from "next-themes";
 import { useState } from "react";
 
@@ -26,9 +36,11 @@ interface ChatSidebarProps {
 export const ChatSidebar = ({ isCollapsed, onToggle }: ChatSidebarProps) => {
   const { theme, setTheme } = useTheme();
   const [history, setHistory] = useState<ChatHistory[]>(initialHistory);
+  const [showClearDialog, setShowClearDialog] = useState(false);
 
   const clearAllHistory = () => {
     setHistory([]);
+    setShowClearDialog(false);
   };
 
   const deleteHistoryItem = (id: string) => {
@@ -79,7 +91,7 @@ export const ChatSidebar = ({ isCollapsed, onToggle }: ChatSidebarProps) => {
                   variant="ghost"
                   size="icon"
                   className="h-6 w-6"
-                  onClick={clearAllHistory}
+                  onClick={() => setShowClearDialog(true)}
                   title="Clear all history"
                 >
                   <Trash2 className="h-3 w-3" />
@@ -150,6 +162,21 @@ export const ChatSidebar = ({ isCollapsed, onToggle }: ChatSidebarProps) => {
           </div>
         )}
       </div>
+
+      <AlertDialog open={showClearDialog} onOpenChange={setShowClearDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Clear all history?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete all your search history. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={clearAllHistory}>Clear All</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
