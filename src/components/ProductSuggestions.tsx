@@ -145,44 +145,54 @@ export const ProductSuggestions = () => {
       <Collapsible open={filtersOpen} onOpenChange={setFiltersOpen}>
         <CollapsibleContent className="border-b border-border">
           <div className="p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-foreground">Filter by Model</p>
+            <div className="flex items-center justify-end">
               {(selectedModels.length > 0 || selectedCategories.length > 0) && (
                 <Button variant="ghost" size="sm" onClick={clearFilters}>
                   Clear All
                 </Button>
               )}
             </div>
-            <div className="flex flex-wrap gap-2">
-              {allModels.map((model) => (
-                <Badge
-                  key={model}
-                  variant={selectedModels.includes(model) ? "default" : "outline"}
-                  className="cursor-pointer hover:bg-primary/20"
-                  onClick={() => toggleModel(model)}
-                >
-                  {model}
-                  {selectedModels.includes(model) && (
-                    <X className="ml-1 h-3 w-3" />
-                  )}
-                </Badge>
-              ))}
-            </div>
+            
+            <Collapsible defaultOpen>
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" size="sm" className="w-full justify-between">
+                  <span className="text-sm font-medium">Filter by Model</span>
+                  <ChevronDown className="h-4 w-4 transition-transform duration-200 data-[state=open]:rotate-180" />
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="mt-2 animate-accordion-down data-[state=closed]:animate-accordion-up">
+                <div className="flex flex-wrap gap-2">
+                  {allModels.map((model) => (
+                    <Badge
+                      key={model}
+                      variant={selectedModels.includes(model) ? "default" : "outline"}
+                      className="cursor-pointer hover:bg-primary/20 transition-colors"
+                      onClick={() => toggleModel(model)}
+                    >
+                      {model}
+                      {selectedModels.includes(model) && (
+                        <X className="ml-1 h-3 w-3" />
+                      )}
+                    </Badge>
+                  ))}
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
             
             <Collapsible>
               <CollapsibleTrigger asChild>
-                <Button variant="ghost" size="sm" className="w-full justify-between mt-2">
+                <Button variant="ghost" size="sm" className="w-full justify-between">
                   <span className="text-sm font-medium">Filter by Category</span>
-                  <ChevronDown className="h-4 w-4" />
+                  <ChevronDown className="h-4 w-4 transition-transform duration-200 data-[state=open]:rotate-180" />
                 </Button>
               </CollapsibleTrigger>
-              <CollapsibleContent className="mt-2">
+              <CollapsibleContent className="mt-2 animate-accordion-down data-[state=closed]:animate-accordion-up">
                 <div className="flex flex-wrap gap-2">
                   {allCategories.map((category) => (
                     <Badge
                       key={category}
                       variant={selectedCategories.includes(category) ? "default" : "outline"}
-                      className="cursor-pointer hover:bg-primary/20"
+                      className="cursor-pointer hover:bg-primary/20 transition-colors"
                       onClick={() => toggleCategory(category)}
                     >
                       {category}
