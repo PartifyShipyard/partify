@@ -52,143 +52,143 @@ type ProductFormValues = z.infer<typeof productFormSchema>;
 const mockProducts: Product[] = [
   {
     id: "1",
-    name: "Wireless Gaming Headset",
-    partNumber: "WH-2024-PRO",
-    brand: "Sony",
-    price: 149.99,
-    shippingCost: 5.99,
+    name: "iPhone 14 Pro OLED Display",
+    partNumber: "LCD-IP14P-OL",
+    brand: "iFixit",
+    price: 279.99,
+    shippingCost: 8.99,
     estimatedShipping: "2-3 business days",
     validatedByManufacturer: true,
     availability: "in-stock",
-    image: "https://images.unsplash.com/photo-1599669454699-248893623440?w=400",
-    description: "Premium wireless headset with 7.1 surround sound and noise cancellation",
-    compatibleModels: ["PlayStation 5", "Xbox Series X", "PC Windows 10+"],
+    image: "https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=400",
+    description: "Original quality OLED replacement display with digitizer assembly",
+    compatibleModels: ["iPhone 14 Pro", "iPhone 14 Pro Max"],
   },
   {
     id: "2",
-    name: "USB-C Fast Charger",
-    partNumber: "CH-2024-30W",
-    brand: "Anker",
-    price: 24.99,
-    shippingCost: 3.99,
+    name: "Samsung Galaxy S23 Battery",
+    partNumber: "BAT-S23-3900",
+    brand: "Samsung",
+    price: 34.99,
+    shippingCost: 4.99,
     estimatedShipping: "3-5 business days",
     validatedByManufacturer: false,
     availability: "in-stock",
-    image: "https://images.unsplash.com/photo-1591290619762-c588e5b76c19?w=400",
-    description: "30W USB-C power adapter with fast charging support",
-    compatibleModels: ["iPhone 12-15", "Samsung Galaxy S20-S24", "iPad Pro"],
+    image: "https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=400",
+    description: "3900mAh replacement battery with installation tools",
+    compatibleModels: ["Samsung Galaxy S23", "Samsung Galaxy S23+"],
   },
   {
     id: "3",
-    name: "4K Webcam Pro",
-    partNumber: "WC-2024-4K",
-    brand: "Logitech",
-    price: 189.99,
-    shippingCost: 6.99,
+    name: "MacBook Pro Battery Replacement Kit",
+    partNumber: "BAT-MBP16-M1",
+    brand: "iFixit",
+    price: 159.99,
+    shippingCost: 7.99,
     estimatedShipping: "1-2 business days",
     validatedByManufacturer: true,
     availability: "limited",
-    image: "https://images.unsplash.com/photo-1587826080692-f439cd0b70da?w=400",
-    description: "Professional 4K webcam with auto-focus and HDR support",
-    compatibleModels: ["Windows 10+", "macOS 10.15+", "Chrome OS"],
+    image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400",
+    description: "OEM quality battery with all necessary tools and adhesive strips",
+    compatibleModels: ["MacBook Pro 16-inch M1 2021", "MacBook Pro 16-inch M2 2023"],
   },
   {
     id: "4",
-    name: "Bluetooth Keyboard",
-    partNumber: "KB-2024-MX",
-    brand: "Logitech",
-    price: 89.99,
-    shippingCost: 4.99,
+    name: "USB-C Charging Port Flex Cable",
+    partNumber: "FLX-USBC-UNIV",
+    brand: "RepairTech",
+    price: 19.99,
+    shippingCost: 3.99,
     estimatedShipping: "2-4 business days",
     validatedByManufacturer: true,
     availability: "in-stock",
-    image: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400",
-    description: "Mechanical keyboard with customizable RGB backlighting",
-    compatibleModels: ["Windows 10+", "macOS 10.15+", "iPad OS 14+"],
+    image: "https://images.unsplash.com/photo-1591290619762-c588e5b76c19?w=400",
+    description: "Replacement charging port flex cable assembly for USB-C devices",
+    compatibleModels: ["Samsung Galaxy S21-S24", "Google Pixel 6-8", "OnePlus 9-11"],
   },
   {
     id: "5",
-    name: "Wireless Mouse Pro",
-    partNumber: "MS-2024-WL",
-    brand: "Logitech",
-    price: 69.99,
-    shippingCost: 3.99,
+    name: "iPad Pro Rear Camera Module",
+    partNumber: "CAM-IPP-12MP",
+    brand: "iFixit",
+    price: 89.99,
+    shippingCost: 5.99,
     estimatedShipping: "1-2 business days",
     validatedByManufacturer: true,
     availability: "in-stock",
-    image: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400",
-    description: "Ergonomic wireless mouse with precision tracking",
-    compatibleModels: ["Windows 10+", "macOS 10.15+", "Linux"],
+    image: "https://images.unsplash.com/photo-1585790050230-5dd28404f8db?w=400",
+    description: "12MP rear camera replacement module with flex cable",
+    compatibleModels: ["iPad Pro 11-inch 2020-2022", "iPad Pro 12.9-inch 2020-2022"],
   },
   {
     id: "6",
-    name: "Portable SSD 1TB",
-    partNumber: "SSD-2024-1T",
-    brand: "Samsung",
-    price: 119.99,
-    shippingCost: 5.99,
+    name: "Laptop Speaker Replacement",
+    partNumber: "SPK-LT-UNIV",
+    brand: "RepairTech",
+    price: 24.99,
+    shippingCost: 4.99,
     estimatedShipping: "3-5 business days",
     validatedByManufacturer: false,
     availability: "in-stock",
-    image: "https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=400",
-    description: "Ultra-fast portable SSD with USB 3.2 Gen 2 interface",
-    compatibleModels: ["Windows 10+", "macOS 10.15+", "Android 9+"],
+    image: "https://images.unsplash.com/photo-1593640408182-31c70c8268f5?w=400",
+    description: "Universal laptop speaker set with connection cables",
+    compatibleModels: ["HP Pavilion 15", "Dell Inspiron 15", "Lenovo IdeaPad"],
   },
   {
     id: "7",
-    name: "Screen Protector Kit",
-    partNumber: "SP-2024-UNI",
-    brand: "Belkin",
-    price: 14.99,
-    shippingCost: 2.99,
-    estimatedShipping: "2-3 business days",
-    validatedByManufacturer: true,
-    availability: "in-stock",
-    image: "https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=400",
-    description: "Tempered glass screen protector with easy application kit",
-    compatibleModels: ["iPhone 14-15", "Samsung Galaxy S23-S24", "Google Pixel 7-8"],
-  },
-  {
-    id: "8",
-    name: "USB Hub 7-Port",
-    partNumber: "HUB-2024-7P",
-    brand: "Anker",
-    price: 39.99,
-    shippingCost: 4.99,
-    estimatedShipping: "1-2 business days",
-    validatedByManufacturer: true,
-    availability: "limited",
-    image: "https://images.unsplash.com/photo-1625948515291-69613efd103f?w=400",
-    description: "7-port USB 3.0 hub with individual power switches",
-    compatibleModels: ["Windows 10+", "macOS 10.15+", "Linux"],
-  },
-  {
-    id: "9",
-    name: "HDMI Cable 2.1",
-    partNumber: "HDMI-2024-4K",
-    brand: "Belkin",
-    price: 19.99,
-    shippingCost: 2.99,
-    estimatedShipping: "3-5 business days",
-    validatedByManufacturer: false,
-    availability: "in-stock",
-    image: "https://images.unsplash.com/photo-1589739900243-c84a0d9e9e03?w=400",
-    description: "HDMI 2.1 cable supporting 4K@120Hz and 8K@60Hz",
-    compatibleModels: ["PlayStation 5", "Xbox Series X", "4K/8K TVs"],
-  },
-  {
-    id: "10",
-    name: "Wireless Charging Pad",
-    partNumber: "WC-2024-15W",
-    brand: "Samsung",
-    price: 34.99,
+    name: "Phone Opening Tool Kit",
+    partNumber: "TOOL-OPEN-PRO",
+    brand: "iFixit",
+    price: 29.99,
     shippingCost: 3.99,
     estimatedShipping: "2-3 business days",
     validatedByManufacturer: true,
     availability: "in-stock",
-    image: "https://images.unsplash.com/photo-1591290619762-c588e5b76c19?w=400",
-    description: "15W fast wireless charging pad with LED indicator",
+    image: "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?w=400",
+    description: "Professional phone repair toolkit with precision screwdrivers and pry tools",
+    compatibleModels: ["iPhone All Models", "Samsung Galaxy All Models", "Google Pixel All Models"],
+  },
+  {
+    id: "8",
+    name: "Adhesive Strips & Seals Kit",
+    partNumber: "ADH-SEAL-KIT",
+    brand: "iFixit",
+    price: 12.99,
+    shippingCost: 2.99,
+    estimatedShipping: "1-2 business days",
+    validatedByManufacturer: true,
+    availability: "limited",
+    image: "https://images.unsplash.com/photo-1585366119957-e9730b6d0f60?w=400",
+    description: "Pre-cut adhesive strips for display and battery replacements",
     compatibleModels: ["iPhone 12-15", "Samsung Galaxy S20-S24", "Google Pixel 6-8"],
+  },
+  {
+    id: "9",
+    name: "Nintendo Switch Joy-Con Buttons",
+    partNumber: "BTN-NSW-JC",
+    brand: "RepairTech",
+    price: 16.99,
+    shippingCost: 3.99,
+    estimatedShipping: "3-5 business days",
+    validatedByManufacturer: false,
+    availability: "in-stock",
+    image: "https://images.unsplash.com/photo-1578303512597-81e6cc155b3e?w=400",
+    description: "Complete button set for Joy-Con controller repair",
+    compatibleModels: ["Nintendo Switch Original", "Nintendo Switch OLED"],
+  },
+  {
+    id: "10",
+    name: "Laptop Keyboard Replacement",
+    partNumber: "KBD-LT-US",
+    brand: "RepairTech",
+    price: 44.99,
+    shippingCost: 5.99,
+    estimatedShipping: "2-3 business days",
+    validatedByManufacturer: true,
+    availability: "in-stock",
+    image: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400",
+    description: "US layout laptop keyboard with backlight support",
+    compatibleModels: ["HP ProBook 450", "Dell Latitude 5420", "Lenovo ThinkPad E15"],
   },
 ];
 
@@ -305,8 +305,8 @@ export const ProductSuggestions = () => {
       {/* Header */}
       <div className="border-b border-border h-[64px] flex items-center px-4">
         <div className="w-full">
-          <h2 className="text-lg font-semibold text-foreground">Suggested Products</h2>
-          <p className="text-sm text-muted-foreground">{sortedProducts.length} results found</p>
+          <h2 className="text-lg font-semibold text-foreground">Search Results</h2>
+          <p className="text-sm text-muted-foreground">{sortedProducts.length} parts found</p>
         </div>
       </div>
 
@@ -325,7 +325,7 @@ export const ProductSuggestions = () => {
                 <DialogHeader>
                   <DialogTitle>Add New Product</DialogTitle>
                   <DialogDescription>
-                    Fill in the product details below to add a new electronic item to the catalog.
+                    Fill in the part details below to add a new repair component to the catalog.
                   </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
@@ -338,7 +338,7 @@ export const ProductSuggestions = () => {
                           <FormItem>
                             <FormLabel>Product Name</FormLabel>
                             <FormControl>
-                              <Input placeholder="Wireless Gaming Headset" {...field} />
+                              <Input placeholder="iPhone 14 Pro OLED Display" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -351,7 +351,7 @@ export const ProductSuggestions = () => {
                           <FormItem>
                             <FormLabel>Part Number</FormLabel>
                             <FormControl>
-                              <Input placeholder="WH-2024-PRO" {...field} />
+                              <Input placeholder="LCD-IP14P-OL" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -367,7 +367,7 @@ export const ProductSuggestions = () => {
                           <FormItem>
                             <FormLabel>Brand</FormLabel>
                             <FormControl>
-                              <Input placeholder="Sony" {...field} />
+                              <Input placeholder="iFixit" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -405,7 +405,7 @@ export const ProductSuggestions = () => {
                           <FormItem>
                             <FormLabel>Price (€)</FormLabel>
                             <FormControl>
-                              <Input type="number" step="0.01" placeholder="149.99" {...field} />
+                              <Input type="number" step="0.01" placeholder="279.99" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -460,7 +460,7 @@ export const ProductSuggestions = () => {
                         <FormItem>
                           <FormLabel>Description</FormLabel>
                           <FormControl>
-                            <Textarea placeholder="Premium wireless headset with 7.1 surround sound..." {...field} />
+                            <Textarea placeholder="Original quality OLED replacement display..." {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -474,7 +474,7 @@ export const ProductSuggestions = () => {
                         <FormItem>
                           <FormLabel>Compatible Models (comma-separated)</FormLabel>
                           <FormControl>
-                            <Input placeholder="PlayStation 5, Xbox Series X, PC Windows 10+" {...field} />
+                            <Input placeholder="iPhone 14 Pro, iPhone 14 Pro Max" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
