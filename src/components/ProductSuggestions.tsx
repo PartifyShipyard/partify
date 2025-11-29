@@ -134,26 +134,29 @@ export const ProductSuggestions = () => {
   return (
     <div className="flex h-screen flex-1 flex-col border-r border-border bg-card">
       {/* Header */}
-      <div className="border-b border-border h-[72px] flex items-center px-4">
+      <div className="border-b border-border h-[60px] flex items-center px-4">
+        <div className="w-full">
+          <h2 className="text-lg font-semibold text-foreground">Suggested Parts</h2>
+          <p className="text-sm text-muted-foreground">{sortedProducts.length} results found</p>
+        </div>
+      </div>
+
+      {/* Controls: Filtering and Sorting */}
+      <div className="border-b border-border h-[60px] flex items-center px-4">
         <div className="flex items-center justify-between w-full">
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">Suggested Parts</h2>
-            <p className="text-sm text-muted-foreground">{sortedProducts.length} results found</p>
-          </div>
-          <div className="flex gap-2 items-center">
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[180px] h-9">
-                <ArrowUpDown className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="default">Default</SelectItem>
-                <SelectItem value="price-low">Price: Low to High</SelectItem>
-                <SelectItem value="price-high">Price: High to Low</SelectItem>
-                <SelectItem value="validated">Validated First</SelectItem>
-              </SelectContent>
-            </Select>
-            <div className="flex gap-1">
+          <Select value={sortBy} onValueChange={setSortBy}>
+            <SelectTrigger className="w-[180px] h-9">
+              <ArrowUpDown className="h-4 w-4 mr-2" />
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="default">Default</SelectItem>
+              <SelectItem value="price-low">Price: Low to High</SelectItem>
+              <SelectItem value="price-high">Price: High to Low</SelectItem>
+              <SelectItem value="validated">Validated First</SelectItem>
+            </SelectContent>
+          </Select>
+          <div className="flex gap-1">
             <Popover open={filtersOpen} onOpenChange={setFiltersOpen}>
               <PopoverTrigger asChild>
                 <Button
@@ -248,7 +251,6 @@ export const ProductSuggestions = () => {
             >
               <Grid3x3 className="h-4 w-4" />
             </Button>
-            </div>
           </div>
         </div>
       </div>
