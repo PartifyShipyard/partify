@@ -1,8 +1,9 @@
-import { History, Plus, User, Settings, Moon, Sun, Menu } from "lucide-react";
+import { History, Plus, User, Settings, Moon, Sun, Menu, X, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useTheme } from "next-themes";
+import { useState } from "react";
 
 interface ChatHistory {
   id: string;
@@ -10,7 +11,7 @@ interface ChatHistory {
   date: string;
 }
 
-const mockHistory: ChatHistory[] = [
+const initialHistory: ChatHistory[] = [
   { id: "1", title: "Brake pad search", date: "Today" },
   { id: "2", title: "Engine oil filter", date: "Today" },
   { id: "3", title: "Timing belt kit", date: "Yesterday" },
@@ -24,6 +25,15 @@ interface ChatSidebarProps {
 
 export const ChatSidebar = ({ isCollapsed, onToggle }: ChatSidebarProps) => {
   const { theme, setTheme } = useTheme();
+  const [history, setHistory] = useState<ChatHistory[]>(initialHistory);
+
+  const clearAllHistory = () => {
+    setHistory([]);
+  };
+
+  const deleteHistoryItem = (id: string) => {
+    setHistory((prev) => prev.filter((item) => item.id !== id));
+  };
 
   return (
     <div className={`flex h-screen flex-col border-r border-border bg-card transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'}`}>
@@ -59,19 +69,49 @@ export const ChatSidebar = ({ isCollapsed, onToggle }: ChatSidebarProps) => {
       <ScrollArea className="flex-1 px-3">
         {!isCollapsed ? (
           <div className="space-y-1 py-4">
-            <div className="mb-2 flex items-center gap-2 px-3 text-sm font-medium text-muted-foreground">
-              <History className="h-4 w-4" />
-              <span>Recent Searches</span>
+            <div className="mb-2 flex items-center justify-between px-3">
+              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                <History className="h-4 w-4" />
+                <span>Recent Searches</span>
+              </div>
+              {history.length > 0 && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6"
+                  onClick={clearAllHistory}
+                  title="Clear all history"
+                >
+                  <Trash2 className="h-3 w-3" />
+                </Button>
+              )}
             </div>
-            {mockHistory.map((chat) => (
-              <button
-                key={chat.id}
-                className="w-full rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-accent"
-              >
-                <div className="font-medium text-foreground">{chat.title}</div>
-                <div className="text-xs text-muted-foreground">{chat.date}</div>
-              </button>
-            ))}
+            {history.length === 0 ? (
+              <div className="px-3 py-8 text-center text-sm text-muted-foreground">
+                No search history
+              </div>
+            ) : (
+              history.map((chat) => (
+                <div
+                  key={chat.id}
+                  className="group relative w-full rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-accent"
+                >
+                  <div className="pr-8">
+                    <div className="font-medium text-foreground">{chat.title}</div>
+                    <div className="text-xs text-muted-foreground">{chat.date}</div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-2 top-1/2 h-6 w-6 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-100"
+                    onClick={() => deleteHistoryItem(chat.id)}
+                    title="Delete search"
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              ))
+            )}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center gap-2 py-4">
