@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { ChevronDown, ChevronUp, ExternalLink, ShoppingCart, Grid3x3, List, X, Filter, CheckCircle } from "lucide-react";
+import { ChevronDown, ChevronUp, ExternalLink, ShoppingCart, Grid3x3, List, X, Filter, CheckCircle, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Product {
   id: string;
@@ -73,6 +74,7 @@ export const ProductSuggestions = () => {
   const [selectedModels, setSelectedModels] = useState<string[]>([]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [sortBy, setSortBy] = useState<string>("default");
 
   // Extract unique models and brands
   const allModels = Array.from(new Set(mockProducts.flatMap((p) => p.compatibleModels)));
@@ -85,6 +87,20 @@ export const ProductSuggestions = () => {
     const brandMatch = selectedBrands.length === 0 || 
       selectedBrands.includes(product.brand);
     return modelMatch && brandMatch;
+  });
+
+  // Sort products
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
+    switch (sortBy) {
+      case "price-low":
+        return a.price - b.price;
+      case "price-high":
+        return b.price - a.price;
+      case "validated":
+        return (b.validatedByManufacturer ? 1 : 0) - (a.validatedByManufacturer ? 1 : 0);
+      default:
+        return 0;
+    }
   });
 
   const toggleModel = (model: string) => {
@@ -122,9 +138,22 @@ export const ProductSuggestions = () => {
         <div className="flex items-center justify-between w-full">
           <div>
             <h2 className="text-lg font-semibold text-foreground">Suggested Parts</h2>
-            <p className="text-sm text-muted-foreground">{filteredProducts.length} results found</p>
+            <p className="text-sm text-muted-foreground">{sortedProducts.length} results found</p>
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-2 items-center">
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-[180px] h-9">
+                <ArrowUpDown className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="default">Default</SelectItem>
+                <SelectItem value="price-low">Price: Low to High</SelectItem>
+                <SelectItem value="price-high">Price: High to Low</SelectItem>
+                <SelectItem value="validated">Validated First</SelectItem>
+              </SelectContent>
+            </Select>
+            <div className="flex gap-1">
             <Popover open={filtersOpen} onOpenChange={setFiltersOpen}>
               <PopoverTrigger asChild>
                 <Button
@@ -219,6 +248,7 @@ export const ProductSuggestions = () => {
             >
               <Grid3x3 className="h-4 w-4" />
             </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -226,7 +256,7 @@ export const ProductSuggestions = () => {
       {/* Products List */}
       <ScrollArea className="flex-1">
         <div className={viewMode === "grid" ? "grid grid-cols-2 gap-3 p-4" : "space-y-3 p-4"}>
-          {filteredProducts.map((product) => (
+          {sortedProducts.map((product) => (
             <Card key={product.id} className="overflow-hidden">
               <CardHeader className="p-4">
                 <div className="flex items-start justify-between gap-3">
