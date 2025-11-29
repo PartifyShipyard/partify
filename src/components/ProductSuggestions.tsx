@@ -638,34 +638,12 @@ export const ProductSuggestions = () => {
             <Card key={product.id} className="overflow-hidden">
               <CardHeader className="p-4">
                 <div className="flex items-start justify-between gap-3">
-                  <div className="flex gap-3 flex-1 min-w-0 items-center">
-                    {expandedId !== product.id && (
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="h-16 w-16 rounded-md object-cover flex-shrink-0"
-                        onError={(e) => {
-                          e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect fill='%23f0f0f0' width='100' height='100'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23999' font-family='sans-serif' font-size='14'%3ENo Image%3C/text%3E%3C/svg%3E";
-                        }}
-                      />
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <CardTitle className="text-base">{product.name}</CardTitle>
-                        {product.validatedByManufacturer && (
-                          <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
-                        )}
-                      </div>
-                      <p className="text-sm text-muted-foreground">{product.brand}</p>
-                      <p className="mt-1 text-xs text-muted-foreground">#{product.partNumber}</p>
-                    </div>
-                  </div>
                   {expandedId !== product.id && (
                     <div className="flex flex-col gap-2 flex-shrink-0">
                       <div className="text-xl font-bold text-foreground">
                         €{(product.price + product.shippingCost).toFixed(2)}
                       </div>
-                      <div className="text-xs text-muted-foreground text-right space-y-0.5">
+                      <div className="text-xs text-muted-foreground space-y-0.5">
                         <div>€{product.price.toFixed(2)} + €{product.shippingCost.toFixed(2)} ship</div>
                         <div>{product.estimatedShipping}</div>
                       </div>
@@ -692,6 +670,30 @@ export const ProductSuggestions = () => {
                       </div>
                     </div>
                   )}
+                  <div className="flex gap-3 flex-1 min-w-0 items-center">
+                    {expandedId !== product.id && (
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="h-16 w-16 rounded-md object-cover flex-shrink-0"
+                        onError={(e) => {
+                          e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect fill='%23f0f0f0' width='100' height='100'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23999' font-family='sans-serif' font-size='14'%3ENo Image%3C/text%3E%3C/svg%3E";
+                        }}
+                      />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <CardTitle className="text-base flex items-center gap-1">
+                          {product.name}
+                          {product.validatedByManufacturer && (
+                            <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
+                          )}
+                        </CardTitle>
+                      </div>
+                      <p className="text-sm text-muted-foreground">{product.brand}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">#{product.partNumber}</p>
+                    </div>
+                  </div>
                   {expandedId === product.id && (
                     <Button
                       variant="ghost"
