@@ -72,8 +72,8 @@ export const ChatInterface = ({ isOpen, onToggle }: ChatInterfaceProps) => {
   return (
     <div className="flex h-screen w-96 flex-col border-l border-border bg-background">
       {/* Chat Header */}
-      <div className="border-b border-border px-6 py-4">
-        <div className="flex items-start justify-between">
+      <div className="h-[72px] flex items-center border-b border-border px-6">
+        <div className="flex items-start justify-between w-full">
           <div>
             <h1 className="text-xl font-semibold text-foreground">Search Spare Parts</h1>
             <p className="text-sm text-muted-foreground">Describe what you need and I'll help you find it</p>
