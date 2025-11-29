@@ -13,6 +13,7 @@ interface Product {
   partNumber: string;
   brand: string;
   price: number;
+  shippingCost: number;
   availability: "in-stock" | "limited" | "out-of-stock";
   image: string;
   description: string;
@@ -25,7 +26,8 @@ const mockProducts: Product[] = [
     name: "Premium Brake Pad Set",
     partNumber: "BP-2024-FR",
     brand: "Brembo",
-    price: 89.99,
+    price: 84.99,
+    shippingCost: 5.99,
     availability: "in-stock",
     image: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400",
     description: "High-performance ceramic brake pads for front axle",
@@ -36,7 +38,8 @@ const mockProducts: Product[] = [
     name: "Economy Brake Pad Set",
     partNumber: "BP-2024-EC",
     brand: "AutoParts Pro",
-    price: 49.99,
+    price: 47.99,
+    shippingCost: 4.99,
     availability: "in-stock",
     image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=400",
     description: "Reliable brake pads for everyday use",
@@ -47,7 +50,8 @@ const mockProducts: Product[] = [
     name: "Performance Brake Kit",
     partNumber: "BK-2024-PR",
     brand: "StopTech",
-    price: 299.99,
+    price: 284.99,
+    shippingCost: 9.99,
     availability: "limited",
     image: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=400",
     description: "Complete brake upgrade kit with rotors and pads",
@@ -232,7 +236,7 @@ export const ProductSuggestions = () => {
                       <p className="mt-1 text-xs text-muted-foreground">#{product.partNumber}</p>
                       {expandedId !== product.id && (
                         <p className="mt-1 text-lg font-bold text-foreground">
-                          ${product.price.toFixed(2)}
+                          €{product.price.toFixed(2)}
                         </p>
                       )}
                     </div>
@@ -272,13 +276,20 @@ export const ProductSuggestions = () => {
                     </div>
                   </div>
 
-                  <div className="mb-3 flex items-center justify-between">
-                    <Badge className={getAvailabilityColor(product.availability)}>
-                      {product.availability.replace("-", " ")}
-                    </Badge>
-                    <span className="text-xl font-bold text-foreground">
-                      ${product.price.toFixed(2)}
-                    </span>
+                  <div className="mb-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Badge className={getAvailabilityColor(product.availability)}>
+                        {product.availability.replace("-", " ")}
+                      </Badge>
+                      <div className="text-right">
+                        <div className="text-xl font-bold text-foreground">
+                          €{product.price.toFixed(2)}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          + €{product.shippingCost.toFixed(2)} shipping
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
                   <div className="flex gap-2">
