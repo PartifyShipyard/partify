@@ -671,17 +671,18 @@ export const ProductSuggestions = () => {
                       <CollapsibleContent className="mt-2 animate-accordion-down data-[state=closed]:animate-accordion-up">
                         <div className="flex flex-wrap gap-2">
                           {allModels.map((model) => (
-                            <Badge
+                            <Button
                               key={model}
                               variant={selectedModels.includes(model) ? "default" : "outline"}
-                              className="cursor-pointer hover:bg-primary/20 transition-colors"
+                              size="sm"
+                              className="h-auto py-1 px-3"
                               onClick={() => toggleModel(model)}
                             >
                               {model}
                               {selectedModels.includes(model) && (
-                                <X className="ml-1 h-3 w-3" />
+                                <X className="ml-1.5 h-3 w-3" />
                               )}
-                            </Badge>
+                            </Button>
                           ))}
                         </div>
                       </CollapsibleContent>
@@ -697,17 +698,18 @@ export const ProductSuggestions = () => {
                       <CollapsibleContent className="mt-2 animate-accordion-down data-[state=closed]:animate-accordion-up">
                         <div className="flex flex-wrap gap-2">
                           {allBrands.map((brand) => (
-                            <Badge
+                            <Button
                               key={brand}
                               variant={selectedBrands.includes(brand) ? "default" : "outline"}
-                              className="cursor-pointer hover:bg-primary/20 transition-colors"
+                              size="sm"
+                              className="h-auto py-1 px-3"
                               onClick={() => toggleBrand(brand)}
                             >
                               {brand}
                               {selectedBrands.includes(brand) && (
-                                <X className="ml-1 h-3 w-3" />
+                                <X className="ml-1.5 h-3 w-3" />
                               )}
-                            </Badge>
+                            </Button>
                           ))}
                         </div>
                       </CollapsibleContent>
