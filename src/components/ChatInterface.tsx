@@ -72,7 +72,7 @@ export const ChatInterface = ({ isOpen, onToggle }: ChatInterfaceProps) => {
   return (
     <div className="flex h-screen w-96 flex-col border-l border-border bg-background">
       {/* Chat Header */}
-      <div className="h-[72px] flex items-center border-b border-border px-6">
+      <div className="h-[72px] flex items-center border-b border-border px-4">
         <div className="flex items-start justify-between w-full">
           <div>
             <h1 className="text-xl font-semibold text-foreground">Search Spare Parts</h1>
