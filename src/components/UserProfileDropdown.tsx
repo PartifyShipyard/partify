@@ -12,7 +12,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Settings, LogOut, User } from "lucide-react";
 
-export const UserProfileDropdown = () => {
+interface UserProfileDropdownProps {
+  showName?: boolean;
+}
+
+export const UserProfileDropdown = ({ showName = false }: UserProfileDropdownProps) => {
   const navigate = useNavigate();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [userName, setUserName] = useState<string>("");
@@ -56,13 +60,22 @@ export const UserProfileDropdown = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+        <Button 
+          variant="ghost" 
+          className={`relative ${showName ? 'w-full justify-start gap-3 px-2 py-2 h-auto' : 'h-10 w-10 rounded-full'}`}
+        >
           <Avatar className="h-10 w-10">
             <AvatarImage src={avatarUrl || undefined} alt={userName} />
             <AvatarFallback className="bg-primary text-primary-foreground">
               {getInitials()}
             </AvatarFallback>
           </Avatar>
+          {showName && (
+            <div className="flex flex-col items-start flex-1 min-w-0">
+              <span className="text-sm font-medium truncate">{userName}</span>
+              <span className="text-xs text-muted-foreground">View profile</span>
+            </div>
+          )}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 bg-card z-50" align="end" forceMount>
