@@ -307,7 +307,7 @@ export const ProductSuggestions = () => {
   };
 
   return (
-    <div className="flex h-screen flex-1 flex-col border-r border-border bg-card">
+    <div className="flex h-full min-h-0 flex-1 flex-col border-r border-border bg-card">
       {/* Header */}
       <div className="border-b border-border h-[64px] flex items-center px-4">
         <div className="w-full">
