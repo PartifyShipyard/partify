@@ -52,143 +52,143 @@ type ProductFormValues = z.infer<typeof productFormSchema>;
 const mockProducts: Product[] = [
   {
     id: "1",
-    name: "Premium Brake Pad Set",
-    partNumber: "BP-2024-FR",
-    brand: "Brembo",
-    price: 84.99,
+    name: "Wireless Gaming Headset",
+    partNumber: "WH-2024-PRO",
+    brand: "Sony",
+    price: 149.99,
     shippingCost: 5.99,
     estimatedShipping: "2-3 business days",
     validatedByManufacturer: true,
     availability: "in-stock",
-    image: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400",
-    description: "High-performance ceramic brake pads for front axle",
-    compatibleModels: ["Honda Civic 2020-2024", "Honda Accord 2019-2024", "Toyota Camry 2018-2023"],
+    image: "https://images.unsplash.com/photo-1599669454699-248893623440?w=400",
+    description: "Premium wireless headset with 7.1 surround sound and noise cancellation",
+    compatibleModels: ["PlayStation 5", "Xbox Series X", "PC Windows 10+"],
   },
   {
     id: "2",
-    name: "Economy Brake Pad Set",
-    partNumber: "BP-2024-EC",
-    brand: "AutoParts Pro",
-    price: 47.99,
-    shippingCost: 4.99,
+    name: "USB-C Fast Charger",
+    partNumber: "CH-2024-30W",
+    brand: "Anker",
+    price: 24.99,
+    shippingCost: 3.99,
     estimatedShipping: "3-5 business days",
     validatedByManufacturer: false,
     availability: "in-stock",
-    image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=400",
-    description: "Reliable brake pads for everyday use",
-    compatibleModels: ["Ford F-150 2015-2023", "Chevrolet Silverado 2016-2024"],
+    image: "https://images.unsplash.com/photo-1591290619762-c588e5b76c19?w=400",
+    description: "30W USB-C power adapter with fast charging support",
+    compatibleModels: ["iPhone 12-15", "Samsung Galaxy S20-S24", "iPad Pro"],
   },
   {
     id: "3",
-    name: "Performance Brake Kit",
-    partNumber: "BK-2024-PR",
-    brand: "StopTech",
-    price: 284.99,
-    shippingCost: 9.99,
+    name: "4K Webcam Pro",
+    partNumber: "WC-2024-4K",
+    brand: "Logitech",
+    price: 189.99,
+    shippingCost: 6.99,
     estimatedShipping: "1-2 business days",
     validatedByManufacturer: true,
     availability: "limited",
-    image: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=400",
-    description: "Complete brake upgrade kit with rotors and pads",
-    compatibleModels: ["BMW 3 Series 2017-2024", "Audi A4 2018-2024"],
+    image: "https://images.unsplash.com/photo-1587826080692-f439cd0b70da?w=400",
+    description: "Professional 4K webcam with auto-focus and HDR support",
+    compatibleModels: ["Windows 10+", "macOS 10.15+", "Chrome OS"],
   },
   {
     id: "4",
-    name: "OEM Brake Disc Set",
-    partNumber: "BD-2024-OEM",
-    brand: "Brembo",
-    price: 159.99,
-    shippingCost: 7.99,
+    name: "Bluetooth Keyboard",
+    partNumber: "KB-2024-MX",
+    brand: "Logitech",
+    price: 89.99,
+    shippingCost: 4.99,
     estimatedShipping: "2-4 business days",
     validatedByManufacturer: true,
     availability: "in-stock",
-    image: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400",
-    description: "Original equipment manufacturer brake discs for optimal performance",
-    compatibleModels: ["Honda Civic 2020-2024", "Toyota Camry 2018-2023"],
+    image: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400",
+    description: "Mechanical keyboard with customizable RGB backlighting",
+    compatibleModels: ["Windows 10+", "macOS 10.15+", "iPad OS 14+"],
   },
   {
     id: "5",
-    name: "Sport Brake Caliper",
-    partNumber: "BC-2024-SP",
-    brand: "StopTech",
-    price: 399.99,
-    shippingCost: 12.99,
+    name: "Wireless Mouse Pro",
+    partNumber: "MS-2024-WL",
+    brand: "Logitech",
+    price: 69.99,
+    shippingCost: 3.99,
     estimatedShipping: "1-2 business days",
     validatedByManufacturer: true,
     availability: "in-stock",
-    image: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=400",
-    description: "High-performance sport brake caliper with enhanced stopping power",
-    compatibleModels: ["BMW 3 Series 2017-2024", "Audi A4 2018-2024"],
+    image: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400",
+    description: "Ergonomic wireless mouse with precision tracking",
+    compatibleModels: ["Windows 10+", "macOS 10.15+", "Linux"],
   },
   {
     id: "6",
-    name: "Budget Brake Disc",
-    partNumber: "BD-2024-BG",
-    brand: "AutoParts Pro",
-    price: 65.99,
+    name: "Portable SSD 1TB",
+    partNumber: "SSD-2024-1T",
+    brand: "Samsung",
+    price: 119.99,
     shippingCost: 5.99,
     estimatedShipping: "3-5 business days",
     validatedByManufacturer: false,
     availability: "in-stock",
-    image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=400",
-    description: "Affordable brake disc for daily driving",
-    compatibleModels: ["Ford F-150 2015-2023", "Chevrolet Silverado 2016-2024"],
+    image: "https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=400",
+    description: "Ultra-fast portable SSD with USB 3.2 Gen 2 interface",
+    compatibleModels: ["Windows 10+", "macOS 10.15+", "Android 9+"],
   },
   {
     id: "7",
-    name: "Racing Brake Fluid",
-    partNumber: "BF-2024-RC",
-    brand: "Brembo",
-    price: 24.99,
+    name: "Screen Protector Kit",
+    partNumber: "SP-2024-UNI",
+    brand: "Belkin",
+    price: 14.99,
+    shippingCost: 2.99,
+    estimatedShipping: "2-3 business days",
+    validatedByManufacturer: true,
+    availability: "in-stock",
+    image: "https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=400",
+    description: "Tempered glass screen protector with easy application kit",
+    compatibleModels: ["iPhone 14-15", "Samsung Galaxy S23-S24", "Google Pixel 7-8"],
+  },
+  {
+    id: "8",
+    name: "USB Hub 7-Port",
+    partNumber: "HUB-2024-7P",
+    brand: "Anker",
+    price: 39.99,
+    shippingCost: 4.99,
+    estimatedShipping: "1-2 business days",
+    validatedByManufacturer: true,
+    availability: "limited",
+    image: "https://images.unsplash.com/photo-1625948515291-69613efd103f?w=400",
+    description: "7-port USB 3.0 hub with individual power switches",
+    compatibleModels: ["Windows 10+", "macOS 10.15+", "Linux"],
+  },
+  {
+    id: "9",
+    name: "HDMI Cable 2.1",
+    partNumber: "HDMI-2024-4K",
+    brand: "Belkin",
+    price: 19.99,
+    shippingCost: 2.99,
+    estimatedShipping: "3-5 business days",
+    validatedByManufacturer: false,
+    availability: "in-stock",
+    image: "https://images.unsplash.com/photo-1589739900243-c84a0d9e9e03?w=400",
+    description: "HDMI 2.1 cable supporting 4K@120Hz and 8K@60Hz",
+    compatibleModels: ["PlayStation 5", "Xbox Series X", "4K/8K TVs"],
+  },
+  {
+    id: "10",
+    name: "Wireless Charging Pad",
+    partNumber: "WC-2024-15W",
+    brand: "Samsung",
+    price: 34.99,
     shippingCost: 3.99,
     estimatedShipping: "2-3 business days",
     validatedByManufacturer: true,
     availability: "in-stock",
-    image: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400",
-    description: "High-temperature racing brake fluid DOT 4",
-    compatibleModels: ["Honda Civic 2020-2024", "Honda Accord 2019-2024", "BMW 3 Series 2017-2024"],
-  },
-  {
-    id: "8",
-    name: "Carbon Ceramic Brake Pads",
-    partNumber: "BP-2024-CC",
-    brand: "StopTech",
-    price: 189.99,
-    shippingCost: 8.99,
-    estimatedShipping: "1-2 business days",
-    validatedByManufacturer: true,
-    availability: "limited",
-    image: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=400",
-    description: "Advanced carbon ceramic compound for maximum performance",
-    compatibleModels: ["Audi A4 2018-2024", "BMW 3 Series 2017-2024"],
-  },
-  {
-    id: "9",
-    name: "Standard Brake Shoes",
-    partNumber: "BS-2024-ST",
-    brand: "AutoParts Pro",
-    price: 39.99,
-    shippingCost: 4.99,
-    estimatedShipping: "3-5 business days",
-    validatedByManufacturer: false,
-    availability: "in-stock",
-    image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=400",
-    description: "Standard brake shoes for rear drum brakes",
-    compatibleModels: ["Ford F-150 2015-2023", "Chevrolet Silverado 2016-2024"],
-  },
-  {
-    id: "10",
-    name: "Heavy Duty Brake Line Kit",
-    partNumber: "BL-2024-HD",
-    brand: "Brembo",
-    price: 129.99,
-    shippingCost: 6.99,
-    estimatedShipping: "2-3 business days",
-    validatedByManufacturer: true,
-    availability: "in-stock",
-    image: "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=400",
-    description: "Stainless steel braided brake lines for improved brake feel",
-    compatibleModels: ["Honda Civic 2020-2024", "Toyota Camry 2018-2023", "Honda Accord 2019-2024"],
+    image: "https://images.unsplash.com/photo-1591290619762-c588e5b76c19?w=400",
+    description: "15W fast wireless charging pad with LED indicator",
+    compatibleModels: ["iPhone 12-15", "Samsung Galaxy S20-S24", "Google Pixel 6-8"],
   },
 ];
 
@@ -305,7 +305,7 @@ export const ProductSuggestions = () => {
       {/* Header */}
       <div className="border-b border-border h-[64px] flex items-center px-4">
         <div className="w-full">
-          <h2 className="text-lg font-semibold text-foreground">Suggested Parts</h2>
+          <h2 className="text-lg font-semibold text-foreground">Suggested Products</h2>
           <p className="text-sm text-muted-foreground">{sortedProducts.length} results found</p>
         </div>
       </div>
@@ -325,7 +325,7 @@ export const ProductSuggestions = () => {
                 <DialogHeader>
                   <DialogTitle>Add New Product</DialogTitle>
                   <DialogDescription>
-                    Fill in the product details below to add a new part to the catalog.
+                    Fill in the product details below to add a new electronic item to the catalog.
                   </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
@@ -338,7 +338,7 @@ export const ProductSuggestions = () => {
                           <FormItem>
                             <FormLabel>Product Name</FormLabel>
                             <FormControl>
-                              <Input placeholder="Premium Brake Pad Set" {...field} />
+                              <Input placeholder="Wireless Gaming Headset" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -351,7 +351,7 @@ export const ProductSuggestions = () => {
                           <FormItem>
                             <FormLabel>Part Number</FormLabel>
                             <FormControl>
-                              <Input placeholder="BP-2024-FR" {...field} />
+                              <Input placeholder="WH-2024-PRO" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -367,7 +367,7 @@ export const ProductSuggestions = () => {
                           <FormItem>
                             <FormLabel>Brand</FormLabel>
                             <FormControl>
-                              <Input placeholder="Brembo" {...field} />
+                              <Input placeholder="Sony" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -405,7 +405,7 @@ export const ProductSuggestions = () => {
                           <FormItem>
                             <FormLabel>Price (€)</FormLabel>
                             <FormControl>
-                              <Input type="number" step="0.01" placeholder="84.99" {...field} />
+                              <Input type="number" step="0.01" placeholder="149.99" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -460,7 +460,7 @@ export const ProductSuggestions = () => {
                         <FormItem>
                           <FormLabel>Description</FormLabel>
                           <FormControl>
-                            <Textarea placeholder="High-performance ceramic brake pads..." {...field} />
+                            <Textarea placeholder="Premium wireless headset with 7.1 surround sound..." {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -474,7 +474,7 @@ export const ProductSuggestions = () => {
                         <FormItem>
                           <FormLabel>Compatible Models (comma-separated)</FormLabel>
                           <FormControl>
-                            <Input placeholder="Honda Civic 2020-2024, Honda Accord 2019-2024" {...field} />
+                            <Input placeholder="PlayStation 5, Xbox Series X, PC Windows 10+" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
