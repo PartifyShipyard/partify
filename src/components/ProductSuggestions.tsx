@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -379,7 +380,8 @@ export const ProductSuggestions = () => {
   };
 
   return (
-    <div className="flex h-screen flex-1 flex-col border-r border-border bg-card">
+    <TooltipProvider>
+      <div className="flex h-screen flex-1 flex-col border-r border-border bg-card">
       {/* Header */}
       <div className="border-b border-border h-[64px] flex items-center px-4">
         <div className="w-full">
@@ -742,7 +744,14 @@ export const ProductSuggestions = () => {
                             €{(product.price + product.shippingCost).toFixed(2)}
                           </div>
                           {product.validatedByManufacturer && (
-                            <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Validated by manufacturer</p>
+                              </TooltipContent>
+                            </Tooltip>
                           )}
                         </div>
                         <div className="text-xs text-muted-foreground">
@@ -841,7 +850,14 @@ export const ProductSuggestions = () => {
                             €{product.price.toFixed(2)}
                           </div>
                           {product.validatedByManufacturer && (
-                            <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Validated by manufacturer</p>
+                              </TooltipContent>
+                            </Tooltip>
                           )}
                         </div>
                         <div className="text-xs text-muted-foreground">
@@ -886,6 +902,7 @@ export const ProductSuggestions = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
+    </TooltipProvider>
   );
 };
