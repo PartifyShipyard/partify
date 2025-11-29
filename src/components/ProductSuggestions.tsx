@@ -591,7 +591,7 @@ export const ProductSuggestions = () => {
                 align="end"
                 sideOffset={8}
               >
-                <ScrollArea className="max-h-[60vh]">
+                <ScrollArea className="h-[400px]">
                   <div className="space-y-4 pr-4">
                     <div className="flex items-center justify-between">
                       <h3 className="text-sm font-semibold text-foreground">Filters</h3>
