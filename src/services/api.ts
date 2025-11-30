@@ -3,13 +3,6 @@ import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'ax
 // API Configuration
 const API_BASE_URL = 'https://65.109.143.117/api';
 
-// Debug logger function (set by DebugProvider)
-let debugLogger: ((log: any) => void) | null = null;
-
-export const setDebugLogger = (logger: ((log: any) => void) | null) => {
-  debugLogger = logger;
-};
-
 // Create axios instance with default config
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -56,40 +49,13 @@ const processQueue = (error: any, token: string | null = null) => {
   failedQueue = [];
 };
 
-// Response interceptor for error handling, logging, and token refresh
+// Response interceptor for error handling and token refresh
 apiClient.interceptors.response.use(
   (response) => {
-    // Log successful response
-    if (debugLogger) {
-      const config = response.config as any;
-      debugLogger({
-        method: config.method?.toUpperCase() || 'GET',
-        url: config.url || '',
-        status: response.status,
-        requestData: config._requestData,
-        responseData: response.data,
-      });
-    }
     return response;
   },
   async (error: AxiosError) => {
     const originalRequest = error.config as any;
-
-    // Log error response
-    if (debugLogger) {
-      debugLogger({
-        method: originalRequest?.method?.toUpperCase() || 'GET',
-        url: originalRequest?.url || '',
-        status: error.response?.status,
-        requestData: originalRequest?._requestData,
-        responseData: error.response?.data,
-        error: {
-          message: error.message,
-          code: error.code,
-          response: error.response?.data,
-        },
-      });
-    }
 
     // Handle 401 Unauthorized errors with token refresh
     if (error.response?.status === 401 && !originalRequest._retry) {
@@ -217,6 +183,12 @@ export interface ChatHistory extends ConversationSummary {
   messageCount?: number; // Custom field for UI
 }
 
+export interface User {
+  id: number;
+  email: string;
+  fullName: string;
+}
+
 export interface SearchParams {
   query: string;
   searchByPartNumber?: boolean;
@@ -329,7 +301,7 @@ export const apiService = {
       }
     },
 
-    create: async (product: Omit<Product, 'id'>): Promise<Product> => {
+    create: async (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>): Promise<Product> => {
       const response = await apiClient.post('/products', product);
       return response.data;
     },
@@ -351,20 +323,22 @@ export const apiService = {
 
   // Auth endpoints
   auth: {
-    login: async (email: string, password: string): Promise<{ accessToken: string; refreshToken: string; user: any }> => {
+    login: async (email: string, password: string): Promise<{ accessToken: string; refreshToken: string; user: User }> => {
       const response = await apiClient.post('/auth/login', { email, password });
       if (response.data.accessToken) {
         localStorage.setItem('access_token', response.data.accessToken);
         localStorage.setItem('refresh_token', response.data.refreshToken);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
       }
       return response.data;
     },
 
-    register: async (email: string, password: string, fullName: string): Promise<{ accessToken: string; refreshToken: string; user: any }> => {
+    register: async (email: string, password: string, fullName: string): Promise<{ accessToken: string; refreshToken: string; user: User }> => {
       const response = await apiClient.post('/auth/register', { email, password, fullName });
       if (response.data.accessToken) {
         localStorage.setItem('access_token', response.data.accessToken);
         localStorage.setItem('refresh_token', response.data.refreshToken);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
       }
       return response.data;
     },
@@ -373,6 +347,7 @@ export const apiService = {
       await apiClient.post('/auth/logout');
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
+      localStorage.removeItem('user');
     },
 
     refreshToken: async (): Promise<{ accessToken: string; refreshToken: string }> => {

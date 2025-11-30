@@ -112,9 +112,9 @@ const Auth = () => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="flex flex-col items-center gap-8">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 relative w-full justify-center">
           <div 
-            className="h-12 w-12 bg-primary"
+            className="h-12 w-12 bg-primary opacity-0 animate-logo-center-to-left"
             style={{
               maskImage: 'url(/logo.png)',
               maskSize: 'contain',
@@ -126,9 +126,9 @@ const Auth = () => {
               WebkitMaskPosition: 'center',
             }}
           />
-          <h1 className="text-5xl font-bold text-primary">partify</h1>
+          <h1 className="text-5xl font-bold text-primary opacity-0 animate-slide-out-right">partify</h1>
         </div>
-        <Card className="w-full max-w-md">
+        <Card className="w-full max-w-md opacity-0 animate-fade-in-scale">
         <CardHeader>
           <CardTitle>Welcome</CardTitle>
           <CardDescription>Sign in to your account or create a new one</CardDescription>

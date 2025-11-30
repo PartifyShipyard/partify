@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Settings, LogOut, User } from "lucide-react";
 import { apiService } from "@/services/api";
+import type { User as UserType } from "@/services/api";
 
 interface UserProfileDropdownProps {
   showName?: boolean;
@@ -19,7 +20,22 @@ interface UserProfileDropdownProps {
 export const UserProfileDropdown = ({ showName = false }: UserProfileDropdownProps) => {
   const navigate = useNavigate();
   const [avatarUrl] = useState<string | null>(null);
-  const [userName] = useState<string>("User");
+  const [userName, setUserName] = useState<string>("User");
+  const [userEmail, setUserEmail] = useState<string>("");
+
+  useEffect(() => {
+    // Load user data from localStorage
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        const user: UserType = JSON.parse(userStr);
+        setUserName(user.fullName || user.email.split('@')[0] || 'User');
+        setUserEmail(user.email);
+      } catch (error) {
+        console.error('Failed to parse user data:', error);
+      }
+    }
+  }, []);
 
   const handleLogout = async () => {
     // Logout from API (clears token)
@@ -29,9 +45,10 @@ export const UserProfileDropdown = ({ showName = false }: UserProfileDropdownPro
       console.warn("API logout failed:", error);
     }
     
-    // Clear local tokens
+    // Clear local tokens and user data
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user');
     
     // Navigate to auth page
     navigate("/auth");

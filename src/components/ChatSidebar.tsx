@@ -1,4 +1,4 @@
-import { History, Plus, User, Settings, Moon, Sun, Menu, X, Trash2, Bug } from "lucide-react";
+import { History, Plus, User, Settings, Moon, Sun, Menu, X, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -23,8 +23,6 @@ import { useTheme } from "next-themes";
 import { useState } from "react";
 import { UserProfileDropdown } from "./UserProfileDropdown";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useDebug } from "@/contexts/DebugContext";
-import { Toggle } from "@/components/ui/toggle";
 
 interface ChatHistory {
   id: number;
@@ -53,7 +51,6 @@ export const ChatSidebar = ({
   onDeleteChat,
 }: ChatSidebarProps) => {
   const { theme, setTheme } = useTheme();
-  const { debugMode, toggleDebugMode } = useDebug();
   const [showClearDialog, setShowClearDialog] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const isMobile = useIsMobile();
@@ -79,7 +76,7 @@ export const ChatSidebar = ({
   if (isMobile) {
     return (
       <>
-        <div className="flex h-16 w-full items-center justify-between bg-background px-4">
+        <div className="flex h-16 w-full items-center justify-between bg-background px-4 flex-shrink-0">
           <Sheet open={showMobileMenu} onOpenChange={setShowMobileMenu}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
@@ -96,20 +93,6 @@ export const ChatSidebar = ({
                 {/* Chat History in Sheet */}
                 <ScrollArea className="flex-1 px-3">
                   <div className="space-y-1 py-4">
-                    {/* Debug Mode Toggle */}
-                    <div className="mb-3 px-3">
-                      <Toggle
-                        pressed={debugMode}
-                        onPressedChange={toggleDebugMode}
-                        size="sm"
-                        className="w-full justify-start gap-2"
-                        aria-label="Toggle debug mode"
-                      >
-                        <Bug className="h-4 w-4" />
-                        <span className="text-xs">Debug Mode</span>
-                      </Toggle>
-                    </div>
-                    
                     <div className="mb-2 flex items-center justify-between px-3">
                       <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                         <History className="h-4 w-4" />
@@ -233,20 +216,6 @@ export const ChatSidebar = ({
       <ScrollArea className="flex-1 px-3 transition-all duration-300">
         {!isCollapsed ? (
           <div className="space-y-1 py-4 transition-opacity duration-300">
-            {/* Debug Mode Toggle */}
-            <div className="mb-3 px-3">
-              <Toggle
-                pressed={debugMode}
-                onPressedChange={toggleDebugMode}
-                size="sm"
-                className="w-full justify-start gap-2"
-                aria-label="Toggle debug mode"
-              >
-                <Bug className="h-4 w-4" />
-                <span className="text-xs">Debug Mode</span>
-              </Toggle>
-            </div>
-            
             <div className="mb-2 flex items-center justify-between px-3">
               <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                 <History className="h-4 w-4" />

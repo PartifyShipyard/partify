@@ -87,8 +87,8 @@ const Index = () => {
   }
 
   return (
-    <div className="flex h-full min-h-0 w-full overflow-hidden relative justify-center bg-background">
-      <div className={`flex h-full min-h-0 w-full max-w-[1920px] overflow-hidden relative ${isMobile ? 'flex-col' : ''}`}>
+    <div className={`flex w-full overflow-hidden relative justify-center bg-background ${isMobile ? 'h-screen' : 'h-full min-h-0'}`}>
+      <div className={`flex w-full max-w-[1920px] overflow-hidden relative ${isMobile ? 'flex-col h-screen' : 'h-full min-h-0'}`}>
         <ChatSidebar
           isCollapsed={isSidebarCollapsed}
           onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
@@ -97,7 +97,7 @@ const Index = () => {
           onSelectChat={handleSelectChat}
           onDeleteChat={deleteConversation}
         />
-        <div className={`flex flex-1 min-h-0 ${isMobile ? 'flex-col' : ''}`}>
+        <div className={`flex flex-1 ${isMobile ? 'flex-col h-full' : 'min-h-0'}`}>
           <ErrorBoundary>
             <ProductSuggestions 
               onChatToggle={() => setIsChatOpen(!isChatOpen)} 

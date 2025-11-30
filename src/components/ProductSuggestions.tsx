@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { ChevronDown, ChevronUp, ExternalLink, X, Filter, CheckCircle, ArrowUpDown, Plus, Maximize2, MessageSquare, Sparkles } from "lucide-react";
 import { useProducts } from "@/hooks/useProducts";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -61,6 +62,7 @@ interface ProductSuggestionsProps {
 
 export const ProductSuggestions = ({ onChatToggle, isChatOpen, products: externalProducts }: ProductSuggestionsProps = {}) => {
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const { products: apiProducts, isLoading: isProductLoading, createProduct } = useProducts();
   const [products, setProducts] = useState<Product[]>([]);
   const [expandedId, setExpandedId] = useState<number | null>(null);
@@ -283,7 +285,7 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen, products: externa
 
   return (
     <TooltipProvider>
-      <div className="flex h-screen flex-1 flex-col bg-card">
+      <div className={`flex flex-col bg-card ${isMobile ? 'flex-1 h-0 min-h-0' : 'flex-1 h-screen'}`}>
       {/* Header */}
       <div className="h-[88px] flex items-center justify-between px-4">
         <div className="flex-1">
@@ -640,7 +642,7 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen, products: externa
       <ScrollArea className="flex-1">
         <div className="space-y-6 p-4">
           {showThinkingCard && (
-            <div className="border rounded-lg overflow-hidden bg-card p-4">
+            <div className="border rounded-lg overflow-hidden bg-card p-4 animate-fade-in-up">
               <div className="flex items-center gap-3">
                 <div className="relative h-12 w-12">
                   <span className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />
@@ -650,17 +652,17 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen, products: externa
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-semibold text-primary">Agent is thinking</p>
-                  <p className="text-xs text-muted-foreground">{thinkingMessage}</p>
+                  <p className="text-xs text-muted-foreground transition-all duration-300">{thinkingMessage}</p>
                   {agenticQueue.length > 0 && (
-                    <p className="mt-1 text-[11px] text-muted-foreground">
+                    <p className="mt-1 text-[11px] text-muted-foreground transition-all duration-300">
                       {visibleAgenticIds.length}/{agenticQueue.length} suggestions ready
                     </p>
                   )}
                 </div>
                 <div className="flex items-center gap-1">
-                  <span className="h-2 w-2 rounded-full bg-primary/70 animate-bounce" />
-                  <span className="h-2 w-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: "150ms" }} />
-                  <span className="h-2 w-2 rounded-full bg-primary/50 animate-bounce" style={{ animationDelay: "300ms" }} />
+                  <span className="h-2 w-2 rounded-full bg-primary/70 animate-bounce transition-all duration-200" />
+                  <span className="h-2 w-2 rounded-full bg-primary/60 animate-bounce transition-all duration-200" style={{ animationDelay: "150ms" }} />
+                  <span className="h-2 w-2 rounded-full bg-primary/50 animate-bounce transition-all duration-200" style={{ animationDelay: "300ms" }} />
                 </div>
               </div>
             </div>
@@ -673,7 +675,7 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen, products: externa
                 return (
                   <div
                     key={`placeholder-${product.id}`}
-                    className="h-[132px] rounded-2xl border border-dashed border-primary/30 bg-primary/5 animate-pulse"
+                    className="h-[132px] border border-dashed border-primary/30 bg-primary/5 animate-pulse transition-all duration-500"
                   />
                 );
               }
@@ -681,7 +683,10 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen, products: externa
               return (
                 <Card
                   key={product.id}
-                  className={cn("overflow-hidden")}
+                  className={cn(
+                    "overflow-hidden",
+                    isAgentic ? "animate-fade-in-up" : "opacity-100"
+                  )}
                 >
                   <CardHeader className="p-4">
                     <div className="flex items-stretch justify-between gap-3">
