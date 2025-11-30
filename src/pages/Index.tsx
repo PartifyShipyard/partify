@@ -28,6 +28,7 @@ const Index = () => {
     history,
     isLoading: isChatLoading,
     suggestedProducts,
+    currentConversationId,
     sendMessage,
     loadHistory,
     loadConversation,

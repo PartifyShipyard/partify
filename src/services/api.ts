@@ -6,7 +6,7 @@ const API_BASE_URL = 'https://65.109.143.117/api';
 // Create axios instance with default config
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
+  timeout: 40000, // 40 seconds
   headers: {
     'Content-Type': 'application/json',
   },
@@ -153,8 +153,8 @@ export interface Product {
   stock: number;
   createdAt: string;
   updatedAt: string;
-  // Custom fields (not in API spec)
-  purchasingUrl?: string;
+  link?: string | null; // Product link from API (spec field)
+  sourceUrl?: string | null; // Product source URL (actual response field)
 }
 
 export interface MessageMetadata {
@@ -301,13 +301,16 @@ export const apiService = {
       }
     },
 
-    create: async (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>): Promise<Product> => {
+    create: async (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt' | 'link' | 'sourceUrl'>): Promise<Product> => {
+      // link and sourceUrl are already excluded by the type, so we can pass product directly
       const response = await apiClient.post('/products', product);
       return response.data;
     },
 
     update: async (productId: number, product: Partial<Product>): Promise<Product> => {
-      const response = await apiClient.put(`/products/${productId}`, product);
+      // Remove link and sourceUrl as they're not accepted in update requests (only returned in responses)
+      const { link, sourceUrl, ...productData } = product as any;
+      const response = await apiClient.put(`/products/${productId}`, productData);
       return response.data;
     },
 

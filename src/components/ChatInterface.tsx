@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { MessageSquare, Send, Loader2, X, Hash, Search, Sparkles } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { MessageSquare, Send, X, Hash, Search, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
@@ -32,10 +32,19 @@ export const ChatInterface = ({
   const [input, setInput] = useState("");
   const [searchByPartNumber, setSearchByPartNumber] = useState(false);
   const [useFloatingMode, setUseFloatingMode] = useState(false);
+  const [pendingMessage, setPendingMessage] = useState<string | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   
   // Use external messages or local state
   const messages = externalMessages;
   const isLoading = externalLoading;
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    console.log('ChatInterface: 💬 Messages updated, count:', messages?.length || 0);
+    console.log('ChatInterface: 🎨 UI re-rendering with new messages');
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isLoading]);
 
   useEffect(() => {
     const checkOverflow = () => {
@@ -57,10 +66,13 @@ export const ChatInterface = ({
 
     const messageContent = input;
     setInput("");
+    setPendingMessage(messageContent); // Show message immediately
 
     if (onSendMessage) {
       await onSendMessage(messageContent, searchByPartNumber);
     }
+    
+    setPendingMessage(null); // Clear pending message after response
   };
 
   return (
@@ -73,10 +85,10 @@ export const ChatInterface = ({
         />
       )}
 
-      <div className={`flex h-full flex-col bg-background transition-all duration-300 ease-in-out
+      <div className={`flex flex-col bg-background transition-all duration-300 ease-in-out
         ${useFloatingMode
-          ? `fixed z-50 inset-0 w-full ${isOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}`
-          : `relative z-0 ${isOpen ? 'w-96 opacity-100' : 'w-0 opacity-0 overflow-hidden'}`
+          ? `fixed z-50 inset-0 w-full h-full ${isOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}`
+          : `relative z-0 h-screen ${isOpen ? 'w-96 opacity-100' : 'w-0 opacity-0 overflow-hidden'}`
         }
       `}>
       {/* Chat Header */}
@@ -93,11 +105,16 @@ export const ChatInterface = ({
       </div>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 px-6 min-h-0 transition-opacity duration-300">
+      <ScrollArea className="flex-1 px-6 min-h-0 overflow-hidden transition-opacity duration-300">
         <div className="space-y-4 py-6">
           {messages && messages.length > 0 ? (
             messages.map((message) => {
               try {
+                // Debug: Log message metadata
+                if (message.role === 'assistant' && message.metadata) {
+                  console.log('ChatInterface: Message metadata:', message.id, message.metadata);
+                }
+                
                 return (
                   <div
                     key={message.id}
@@ -171,13 +188,30 @@ export const ChatInterface = ({
               </div>
             )
           )}
-          {isLoading && (
-            <div className="flex justify-start">
-              <div className="rounded-lg bg-card px-4 py-3">
-                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+          {/* Show pending user message immediately */}
+          {pendingMessage && (
+            <div className="flex justify-end animate-fade-in-up">
+              <div className="max-w-[80%] rounded-lg px-4 py-3 bg-primary text-primary-foreground">
+                <p className="text-sm break-words">{pendingMessage}</p>
+                <p className="mt-1 text-xs opacity-70">
+                  {new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                </p>
               </div>
             </div>
           )}
+          {/* Show typing animation while loading */}
+          {isLoading && (
+            <div className="flex justify-start animate-fade-in-up">
+              <div className="rounded-lg bg-card px-4 py-3">
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                  <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                  <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                </div>
+              </div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
         </div>
       </ScrollArea>
 

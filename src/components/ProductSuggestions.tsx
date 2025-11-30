@@ -44,7 +44,6 @@ const productFormSchema = z.object({
   shippingCost: z.coerce.number().min(0, "Shipping cost must be 0 or positive").max(9999, "Shipping cost is too high"),
   estimatedShipping: z.string().trim().min(1, "Estimated shipping is required").max(50, "Estimated shipping must be less than 50 characters"),
   validatedByManufacturer: z.boolean(),
-  purchasingUrl: z.string().trim().url("Must be a valid URL").min(1, "Purchasing URL is required"),
   image: z.string().trim().url("Must be a valid URL").optional().or(z.literal("")),
   description: z.string().trim().min(1, "Description is required").max(500, "Description must be less than 500 characters"),
   compatibleModels: z.string().trim().min(1, "Compatible models are required").max(500, "Compatible models must be less than 500 characters"),
@@ -99,7 +98,6 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen, products: externa
       shippingCost: 0,
       estimatedShipping: "",
       validatedByManufacturer: false,
-      purchasingUrl: "",
       image: "",
       description: "",
       compatibleModels: "",
@@ -219,7 +217,7 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen, products: externa
 
   // Sync API products and external products (from chat) with local state
   useEffect(() => {
-    console.log('ProductSuggestions: Syncing products', {
+    console.log('ProductSuggestions: 🔄 Syncing products', {
       apiProductsCount: apiProducts.length,
       externalProductsCount: externalProducts?.length || 0
     });
@@ -234,9 +232,11 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen, products: externa
           mergedProducts.push(extProduct);
         }
       });
+      console.log('ProductSuggestions: ✅ Added', externalProducts.length, 'external products from chat');
     }
     
-    console.log('ProductSuggestions: Merged products count:', mergedProducts.length);
+    console.log('ProductSuggestions: 📦 Total merged products:', mergedProducts.length);
+    console.log('ProductSuggestions: 🎨 UI will re-render with updated products');
     
     // Always update products (even if empty, to clear when switching conversations)
     setProducts(mergedProducts);
@@ -253,8 +253,6 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen, products: externa
       estimatedShipping: data.estimatedShipping,
       validatedByManufacturer: data.validatedByManufacturer,
       availability: "in-stock" as const,
-      purchasingUrl: data.purchasingUrl,
-      image: imageUrl,
       images: [imageUrl],
       description: data.description,
       compatibleModels: data.compatibleModels.split(',').map(m => m.trim()),
@@ -266,8 +264,8 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen, products: externa
     const result = await createProduct(productData);
     
     if (result) {
-      setDialogOpen(false);
-      form.reset();
+    setDialogOpen(false);
+    form.reset();
       // Product will be added to list via useEffect when apiProducts updates
     }
   };
@@ -362,20 +360,6 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen, products: externa
                             <FormControl>
                               <Input placeholder="iFixit" {...field} />
                             </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    
-                      <FormField
-                        control={form.control}
-                      name="purchasingUrl"
-                        render={({ field }) => (
-                          <FormItem>
-                          <FormLabel>Purchasing URL</FormLabel>
-                              <FormControl>
-                            <Input placeholder="https://example.com/product" {...field} />
-                              </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -688,94 +672,95 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen, products: externa
                     isAgentic ? "animate-fade-in-up" : "opacity-100"
                   )}
                 >
-                  <CardHeader className="p-4">
-                    <div className="flex items-stretch justify-between gap-3">
-                      <div className="flex gap-3 flex-1 min-w-0">
-                        <div className="flex-1 min-w-0 flex flex-col justify-center">
-                          <CardTitle className="text-base leading-none">{product.name}</CardTitle>
-                          <p className="text-sm text-muted-foreground">{product.brand}</p>
-                          <p className="mt-1 text-xs text-muted-foreground">#{product.partNumber}</p>
-                          {expandedId !== product.id && (
-                            <>
-                              <p className="text-xs text-muted-foreground">Ships from: {product.shippingCountry}</p>
-                              <p className="text-xs text-muted-foreground">Stock: {product.stock}</p>
-                            </>
-                          )}
-                        </div>
-                      </div>
+              <CardHeader className="p-4">
+                <div className="flex items-stretch justify-between gap-3">
+                  <div className="flex gap-3 flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 flex flex-col justify-center">
+                      <CardTitle className="text-base leading-none">{product.name}</CardTitle>
+                      <p className="text-sm text-muted-foreground">{product.brand}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">#{product.partNumber}</p>
                       {expandedId !== product.id && (
-                        <div className="flex flex-col gap-2 flex-shrink-0">
-                          <div className="text-right space-y-0.5">
-                            <div className="flex items-center justify-end gap-1.5">
+                        <>
+                          <p className="text-xs text-muted-foreground">Ships from: {product.shippingCountry}</p>
+                          <p className="text-xs text-muted-foreground">Stock: {product.stock}</p>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  {expandedId !== product.id && (
+                    <div className="flex flex-col gap-2 flex-shrink-0">
+                      <div className="text-right space-y-0.5">
+                        <div className="flex items-center justify-end gap-1.5">
                               {product.price > 0 ? (
-                                <div className="text-xl font-bold text-foreground">
-                                  €{(product.price + product.shippingCost).toFixed(2)}
-                                </div>
+                          <div className="text-xl font-bold text-foreground">
+                            €{(product.price + product.shippingCost).toFixed(2)}
+                          </div>
                               ) : (
                                 <div className="text-sm font-medium text-muted-foreground">
                                   Ask Manufacturer
                                 </div>
                               )}
-                              {product.validatedByManufacturer && (
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p>Validated by manufacturer</p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              )}
-                            </div>
+                          {product.validatedByManufacturer && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Validated by manufacturer</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
+                        </div>
                             {product.price > 0 && (
                               <>
-                                <div className="text-xs text-muted-foreground">
-                                  €{product.price.toFixed(2)} + €{product.shippingCost.toFixed(2)} ship
-                                </div>
-                                <div className="text-xs text-muted-foreground">
-                                  {product.estimatedShipping}
-                                </div>
+                        <div className="text-xs text-muted-foreground">
+                          €{product.price.toFixed(2)} + €{product.shippingCost.toFixed(2)} ship
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {product.estimatedShipping}
+                        </div>
                               </>
                             )}
-                          </div>
-                          <div className="flex gap-1 mt-1">
+                      </div>
+                      <div className="flex gap-1 mt-1">
                             <Button
                               variant="outline"
                               size="sm"
                               className="flex-1"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                if (product.purchasingUrl) {
-                                  window.open(product.purchasingUrl, "_blank");
+                                const url = product.sourceUrl || product.link;
+                                if (url) {
+                                  window.open(url, "_blank");
                                 }
                               }}
-                              disabled={!product.purchasingUrl}
+                              disabled={!product.sourceUrl && !product.link}
                             >
                               <ExternalLink className="h-3 w-3 mr-1" />
                               Buy
                             </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setExpandedId(expandedId === product.id ? null : product.id)}
-                            >
-                              <ChevronDown className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      )}
-                      {expandedId === product.id && (
                         <Button
                           variant="ghost"
-                          size="icon"
-                          className="flex-shrink-0"
+                          size="sm"
                           onClick={() => setExpandedId(expandedId === product.id ? null : product.id)}
                         >
-                          <ChevronUp className="h-4 w-4" />
+                          <ChevronDown className="h-4 w-4" />
                         </Button>
-                      )}
+                      </div>
                     </div>
-                  </CardHeader>
+                  )}
+                  {expandedId === product.id && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="flex-shrink-0"
+                      onClick={() => setExpandedId(expandedId === product.id ? null : product.id)}
+                    >
+                      <ChevronUp className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              </CardHeader>
 
               {expandedId === product.id && (
                 <CardContent className="p-4 pt-0">
@@ -874,11 +859,12 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen, products: externa
                       className="flex-1" 
                       size="sm"
                       onClick={() => {
-                        if (product.purchasingUrl) {
-                          window.open(product.purchasingUrl, '_blank');
+                        const url = product.sourceUrl || product.link;
+                        if (url) {
+                          window.open(url, '_blank');
                         }
                       }}
-                      disabled={!product.purchasingUrl}
+                      disabled={!product.sourceUrl && !product.link}
                     >
                       <ExternalLink className="mr-2 h-3 w-3" />
                       Buy from Manufacturer
@@ -886,7 +872,7 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen, products: externa
                   </div>
                 </CardContent>
               )}
-                </Card>
+            </Card>
               );
             })}
           </div>

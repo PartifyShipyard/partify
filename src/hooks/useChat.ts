@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { apiService, ChatMessage, ChatHistory, Product } from '@/services/api';
 import { useToast } from '@/hooks/use-toast';
 
@@ -16,6 +16,18 @@ export const useChat = () => {
       // Send to API
       const response = await apiService.chat.sendMessage(content, searchByPartNumber, currentConversationId);
       
+      console.log('useChat: Got response:', {
+        conversationId: response.conversationId,
+        assistantMessage: response.assistantMessage,
+        metadata: response.assistantMessage?.metadata
+      });
+      
+      // Set conversation ID if new
+      const convId = response.conversationId || currentConversationId;
+      if (convId && !currentConversationId) {
+        setCurrentConversationId(convId);
+      }
+      
       // Add both messages to state
       setMessages((prev) => [...prev, response.userMessage, response.assistantMessage]);
       
@@ -28,30 +40,25 @@ export const useChat = () => {
         try {
           const products = await apiService.products.getByIds(productIds);
           console.log('useChat: Fetched products for new message:', products.length);
-          setSuggestedProducts(products);
+          setSuggestedProducts([...products]); // Force new reference
         } catch (error) {
           console.error('useChat: Failed to fetch products for new message:', error);
           // Fall back to suggestedProducts if API fetch fails
           if (response.suggestedProducts) {
             console.log('useChat: Using fallback suggestedProducts from response');
-            setSuggestedProducts(response.suggestedProducts);
+            setSuggestedProducts([...response.suggestedProducts]); // Force new reference
           }
         }
       }
       // Fall back to suggestedProducts if no productIds in metadata
       else if (response.suggestedProducts) {
         console.log('useChat: Using suggestedProducts from response');
-        setSuggestedProducts(response.suggestedProducts);
+        setSuggestedProducts([...response.suggestedProducts]); // Force new reference
       }
       
-      // Set conversation ID if new conversation and add to history
-      if (response.conversationId && !currentConversationId) {
-        setCurrentConversationId(response.conversationId);
-        
-        // Add the new conversation to history
-        if (response.conversation) {
-          setHistory((prev) => [response.conversation, ...prev]);
-        }
+      // Add the new conversation to history if it's new
+      if (convId && !currentConversationId && response.conversation) {
+        setHistory((prev) => [response.conversation, ...prev]);
       }
 
       return response;
@@ -86,6 +93,7 @@ export const useChat = () => {
 
   const loadConversation = useCallback(async (conversationId: number) => {
     setIsLoading(true);
+    setSuggestedProducts([]); // Clear products immediately when switching chats
     try {
       const conversation = await apiService.chat.getConversation(conversationId);
       console.log('useChat: Loaded conversation', {
@@ -124,7 +132,7 @@ export const useChat = () => {
         try {
           const products = await apiService.products.getByIds(latestProductIds);
           console.log('useChat: Fetched products from API:', products.length);
-          setSuggestedProducts(products);
+          setSuggestedProducts([...products]); // Force new reference
         } catch (error) {
           console.error('useChat: Failed to fetch products:', error);
           toast({
@@ -162,6 +170,7 @@ export const useChat = () => {
       if (currentConversationId === conversationId) {
         setCurrentConversationId(undefined);
         setMessages([]);
+        setSuggestedProducts([]); // Clear products when deleting current conversation
       }
       
       toast({
@@ -208,6 +217,7 @@ export const useChat = () => {
     history,
     isLoading,
     suggestedProducts,
+    currentConversationId,
     sendMessage,
     loadHistory,
     loadConversation,
