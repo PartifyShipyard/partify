@@ -690,11 +690,6 @@ export const ProductSuggestions = ({ onChatToggle, isChatOpen, products: externa
                           <CardTitle className="text-base leading-none">{product.name}</CardTitle>
                           <p className="text-sm text-muted-foreground">{product.brand}</p>
                           <p className="mt-1 text-xs text-muted-foreground">#{product.partNumber}</p>
-                          {isAgentic && (
-                            <Badge className="mt-2 w-fit border border-primary/30 bg-primary/15 text-[10px] font-semibold uppercase tracking-wide text-primary">
-                              Agent pick
-                            </Badge>
-                          )}
                           {expandedId !== product.id && (
                             <>
                               <p className="text-xs text-muted-foreground">Ships from: {product.shippingCountry}</p>
