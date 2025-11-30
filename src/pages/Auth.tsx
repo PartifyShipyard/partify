@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +24,41 @@ const Auth = () => {
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [signupFullName, setSignupFullName] = useState("");
+
+  // Auto-login for demo purposes
+  useEffect(() => {
+    const autoLogin = async () => {
+      // Check if already logged in
+      const existingToken = localStorage.getItem('access_token');
+      if (existingToken) {
+        navigate("/");
+        return;
+      }
+
+      // Check for demo credentials in environment
+      const demoEmail = import.meta.env.VITE_DEMO_EMAIL;
+      const demoPassword = import.meta.env.VITE_DEMO_PASSWORD;
+
+      if (demoEmail && demoPassword) {
+        setIsLoading(true);
+        try {
+          await apiService.auth.login(demoEmail, demoPassword);
+          toast({
+            title: "Demo Mode",
+            description: "Automatically logged in as demo user.",
+          });
+          navigate("/");
+        } catch (error) {
+          // Silently fail - user can manually log in
+          console.error("Auto-login failed:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    autoLogin();
+  }, [navigate, toast]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
